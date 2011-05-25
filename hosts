@@ -1,2 +1,14 @@
 #!/bin/bash
+#############################################
+#                   hosts                   #
+#-------------------------------------------#
+# mercredi 25 mai 2011, 13:00:54 (UTC+0200) #
+# rd2b                                      #
+#############################################
+#Donne la possibilité dexecuter la commande host 
+#sur plusieurs host a la suite
 
+lst=$@
+for h in $lst; do 
+    host $h
+done
