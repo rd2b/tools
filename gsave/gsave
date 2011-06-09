@@ -1,0 +1,44 @@
+#!/bin/bash -x
+
+src=$1
+user="remi"
+
+function printnoconf {
+    echo "$configfile does not exist."
+    echo "Please edit with:"
+    echo "host=\"mybackup.server\""
+    echo "dst=\"~/BackupsDir/\""
+    echo "prefix=\"myprefix\""
+}
+
+function sendToArchive {
+    src=$0
+    user=$1
+    host=$2
+    outfile=$3
+    tar zcvf - $src | ssh $user@$host "cat > $outfile"
+    if [ "$?" -eq "0" ]; then
+        echo "$src saved to $host:/$outfile"
+        return 0
+    else
+        echo "ERROR : $src not saved"
+        return 1
+    fi
+}
+
+configfile="$HOME/.gsaveconfig"
+#config file loading
+if [ ! -f $configfile ] ; then
+    printnoconf
+    exit -1
+else
+    . $configfile
+fi
+
+srcname=`echo $src | tr "/" "_"`
+
+#Sends tar
+
+outfile="$dst/$prefix-`hostname -s`-$srcname`date +%Y%m%d-%H%M`.tar.gz"
+sendToArchive $src $user $host $outfile
+
