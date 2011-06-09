@@ -1,0 +1,38 @@
+#!/bin/bash
+
+function convert {
+    txt2tags=`which txt2tags`
+    input=$1 
+    outdir=$2
+    ext=".t2t"
+    output=${input%$ext}".html"
+    options=" -t html " 
+   
+    $txt2tags --quiet --infile $input  $options
+    mv  $output $outdir
+}
+
+function convertdir {
+    dir=$1
+    outdir=$2
+    for file in `ls $dir`; do
+       file=$dir/$file
+       if [ -f "$file" ]; then
+           convert $file $outdir
+       fi
+    done
+
+}
+
+in=$1
+blogdir=$2
+
+if [ ! -e "$1" ]; then
+	echo "$1 n'existe pas"
+elif [ -f "$1" ]; then
+    txtfile=$in
+    convert $txtfile $blogdir
+elif [ -d "$1" ]; then
+    txtdir=$in
+    convertdir $in $blogdir
+fi
