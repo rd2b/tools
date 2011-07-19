@@ -1,0 +1,63 @@
+#!/bin/bash
+################
+
+CONFIG="./cfsimple.conf"
+. $CONFIG
+src=$localrepo
+groupfile="/etc/cfsimple-info/groups"
+directories="/etc /usr/local"
+host=$(hostname)
+
+if [ ! -d $src ]; then 
+    echo "Le dossier local n'existe pas : $src "
+    exit 1
+fi
+
+#Recuperation de la config
+function copy {
+     local s="$1"
+     local d="$2"
+     echo "cp -vr $s $d"
+}
+
+
+function copydirs {
+local folder=$1
+local subfolder=$2
+if [ -n $folder ]; then
+if [ -n $subfolder ]; then
+
+    for d in $directories; do
+    s="$src/$folder/$subfolder/$d"
+    if [ -n $d ]; then
+        if [ -d $s ]; then
+           copy "$s/*" "$d"
+        else 
+           echo "$s n'existe pas"
+        fi
+    else 
+        echo "$d n'existe pas"
+    fi
+    done
+fi
+fi
+}
+
+function copyhosts {
+    hostsfolder="hosts"
+    copydirs $hostsfolder $host
+}
+
+function copygroups {
+    groupsfolder="groups"
+    if [ -f $groupfile ]; then
+        for group in $(cat $groupfile); do
+            copydirs $groupsfolder $group
+        done
+    else
+        echo "Le fichier de groupes $groupfile n'existe pas"
+    fi
+}
+
+copygroups
+copyhosts

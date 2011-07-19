@@ -1,0 +1,30 @@
+#!/bin/bash -x
+################
+
+CONFIG="./cfsimple.conf"
+. $CONFIG
+
+
+#Test de connection au depot
+SSH="/usr/bin/ssh -l $repouser $repohost "
+dest="$localrepo"
+
+$SSH -- ls $repopath
+if [ ! "$?" -eq "0" ]; then
+    echo "connection impossible"
+    exit -1
+fi
+
+if [ -d $dest ]; then 
+    echo "Le dossier local n'existe pas : $dest "
+fi
+
+#Recuperation de la config
+function pull {
+     pull="/usr/bin/git pull"
+     cd $dest
+     $pull
+}
+
+pull $dest
+
