@@ -1,0 +1,44 @@
+#!/bin/bash
+############################
+# Check machine locale
+############################
+
+
+function authenticate {
+    host=$(hostname)
+    echo -e "Machine :\t$host\n"
+    uname -a
+    echo ""
+}
+
+function checknetwork {
+    network=$1
+    nmap -p $network
+}
+
+function checkdisk {
+    partition=$1
+    size=$(df -h $partition |tail -1 |awk '{print( $5)}')
+    echo "| $partition | $size |"
+
+}
+
+
+function checkram {
+    free -m
+}
+
+echo "Fonctionnement serveur"
+date 
+echo ""
+authenticate
+
+uptime | sed 's/,//g' | awk '{print($2" "$3" "$4" "$5"\n") }'
+uptime | sed 's/,//g' | awk '{print($9" "$10" "$11" "$12"\n")}'
+
+
+parts="/boot / /home /var /var/log /usr /tmp"
+echo "|| Partition | %"
+for p in $parts; do
+    checkdisk $p
+done
