@@ -1,0 +1,115 @@
+#!/bin/bash
+
+#************************************************#
+#                     sc                         #
+#           written by Remi Debay                #
+#                July 20, 2011                   #
+#                                                #
+#         Help managing config files.            #
+#************************************************#
+
+
+CONFIGFILENAME="sc.conf"
+GROUPFILENAME="groups"
+CONFIGDIR="/etc/simpleconf"
+CONFIG="$CONFIGDIR/$CONFIGFILENAME"
+test -f $CONFIG && CONFIG="./sc.conf"
+if [ ! -f $CONFIG ]; then 
+    echo "Le fichier de configuration $CONFIG n'existe pas"
+    CONFIG="./$CONFIGFILENAME"
+    echo "utilisation de $CONFIG"
+    if [ ! -f $CONFIG ]; then
+        echo "Erreur : $CONFIG n'existe pas. "
+        exit -1
+    fi    
+fi
+groupfile="$CONFIGDIR/$GROUPFILENAME"
+
+directories="/etc /usr/local"
+
+. $CONFIG
+
+action="$1"
+
+function init {
+    function testsshconnect {    
+        $SSH -- ls $repopath
+        if [ ! "$?" -eq "0" ]; then
+            echo "connection impossible"
+            exit -1
+        fi
+
+        if [ -d $dest ]; then
+            echo "Le dossier local n'existe pas : $dest "
+            exit -2
+        fi
+    }
+   
+    clone="/usr/bin/git clone "
+    $clone $repouser@$repohost:$repopath $dest
+}
+
+function pull {
+    pull="/usr/bin/git pull"
+    dest="$localrepo"
+    if [ -d $dest ]; then
+         cd $dest
+         $pull
+    else
+        echo "Le repertoire de destination $dest n'existe pas"
+        exit -3
+    fi
+}
+
+function apply {
+    function copy {
+        local s="$1"
+        local d="$2"
+        echo "cp -vr $s $d"
+    }
+
+    function copydirs {
+    local folder=$1
+    local subfolder=$2
+    local s="$src/$folder/$subfolder/$d"
+    if [ -n $folder ]; then
+        if [ -n $subfolder ]; then
+            for d in $directories; do
+            if [ -n $d ]; then
+                if [ -d $s ]; then
+                    copy "$s/*" "$d"
+                else
+                    echo "$s n'existe pas"
+                fi
+            else
+                echo "$d n'existe pas"
+            fi
+            done
+            fi
+        fi
+    }
+    
+    function copyhosts {
+        local hostsfolder="hosts"
+        local host=$(hostname)
+        copydirs $hostsfolder $host
+    }
+   
+    function copygroups {
+        groupsfolder="groups"
+        if [ -f $groupfile ]; then
+            for group in $(cat $groupfile); do
+                copydirs $groupsfolder $group
+            done
+        else
+            echo "Le fichier de groupes $groupfile n'existe pas"
+        fi
+    }
+
+    src=$localrepo
+    
+    copygroups
+    copyhosts
+}
+
+$action
