@@ -13,7 +13,7 @@ CONFIGFILENAME="sc.conf"
 GROUPFILENAME="groups"
 CONFIGDIR="/etc/simpleconf"
 CONFIG="$CONFIGDIR/$CONFIGFILENAME"
-test -f $CONFIG && CONFIG="./sc.conf"
+
 if [ ! -f $CONFIG ]; then 
     echo "Le fichier de configuration $CONFIG n'existe pas"
     CONFIG="./$CONFIGFILENAME"
@@ -23,6 +23,7 @@ if [ ! -f $CONFIG ]; then
         exit -1
     fi    
 fi
+
 groupfile="$CONFIGDIR/$GROUPFILENAME"
 
 directories="/etc /usr/local"
@@ -32,28 +33,31 @@ directories="/etc /usr/local"
 action="$1"
 
 function init {
-    function testsshconnect {    
+    function testsshconnect {
+        SSH="ssh -l $repouser $repohost "
         $SSH -- ls $repopath
         if [ ! "$?" -eq "0" ]; then
             echo "connection impossible"
             exit -1
         fi
 
-        if [ -d $dest ]; then
+        if [ ! -d $dest ]; then
             echo "Le dossier local n'existe pas : $dest "
             exit -2
         fi
     }
-   
+    dest=$localrepo
+    testsshconnect
     clone="/usr/bin/git clone "
-    $clone $repouser@$repohost:$repopath $dest
+    $clone $repouser@$repohost:$repopath/ $dest
 }
 
-function pull {
+function update {
     pull="/usr/bin/git pull"
     dest="$localrepo"
     if [ -d $dest ]; then
          cd $dest
+         
          $pull
     else
         echo "Le repertoire de destination $dest n'existe pas"
@@ -65,19 +69,19 @@ function apply {
     function copy {
         local s="$1"
         local d="$2"
-        echo "cp -vr $s $d"
+        cp -vr $s $d
     }
 
     function copydirs {
     local folder=$1
     local subfolder=$2
-    local s="$src/$folder/$subfolder/$d"
     if [ -n $folder ]; then
         if [ -n $subfolder ]; then
             for d in $directories; do
+    	    local s="$src/$folder/$subfolder/$d"
             if [ -n $d ]; then
                 if [ -d $s ]; then
-                    copy "$s/*" "$d"
+                    copy  "$s/*" "$d"
                 else
                     echo "$s n'existe pas"
                 fi
