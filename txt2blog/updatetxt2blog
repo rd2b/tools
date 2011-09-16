@@ -1,0 +1,11 @@
+#!/bin/bash
+#########################################################
+#	Name: 	updatetxt2blog 				#
+#	Description: Mise a jour du blog 		#
+#########################################################
+
+executable="/home/remi/bin/txt2blog"
+src="/home/remi/Developpements/blog-source/"
+dst="/var/www/blog"
+
+test -x $executable && $executable $src $dst

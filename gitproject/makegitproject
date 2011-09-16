@@ -1,0 +1,18 @@
+#!/bin/bash
+#########################################################
+#	Name: 	makegitproject				#
+#	Description: Generates localhost git project	#
+#########################################################
+
+newproject=$1
+
+if [[ -n $newproject ]] ; then
+    user="git"
+    dir="~/projects/$1.git"
+    con="su - $user -c "
+    $con "mkdir -p $dir"
+    $con " git --bare init $dir "
+fi
+
+
+
