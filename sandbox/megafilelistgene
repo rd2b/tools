@@ -1,21 +1,34 @@
 #!/usr/bin/env python
+#########################################################
+#	Name: 	megafilelistgene			#
+#	Description: Aspirateur de liens 		#
+#########################################################
+
 
 import urllib, re
 import argparse
+
+#Parse des arguments :
 parser = argparse.ArgumentParser()
 parser.add_argument('--url')
 args = parser.parse_args()
 
+REGEXP=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
+
+#-------------------------------------
+# Description : aspirage de la page
+#-------------------------------------
+def dyson(url=None, regexp=None):
+    url = args.url
+    #Ouvrir l'url:
+    f = urllib.urlopen(url)
+    content = f.read()
+
+    #trouver tous les liens : 
+    match = re.findall(REGEXP,content)
+    #Print urls : 
+    for l in match :
+        print(l)
 
 url = args.url
-#Ouvrir l'url:
-f = urllib.urlopen(url)
-content = f.read()
-
-#trouver tous les liens : 
-megauploadr=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
-match = re.findall(megauploadr,content)
-
-#Print urls : 
-for l in match :
-    print(l)
+dyson(url, REGEXP)
