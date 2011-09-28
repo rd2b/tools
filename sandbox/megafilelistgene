@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+
+import urllib, re
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--url')
+args = parser.parse_args()
+
+
+url = args.url
+#Ouvrir l'url:
+f = urllib.urlopen(url)
+content = f.read()
+
+#trouver tous les liens : 
+megauploadr=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
+match = re.findall(megauploadr,content)
+
+#Print urls : 
+for l in match :
+    print(l)
