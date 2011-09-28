@@ -5,7 +5,7 @@
 #########################################################
 
 executable="/home/remi/bin/txt2blog"
-src="/home/remi/Developpements/blog-source/"
-dst="/var/www/blog"
+src="/home/remi/Developpements/private-source/"
+dst="/var/www/private"
 
 test -x $executable && $executable $src $dst
