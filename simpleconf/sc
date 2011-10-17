@@ -1,119 +1,162 @@
-#!/bin/bash
+#!/usr/bin/env python
+#########################################################
+#	Name: 	sc					#
+#	Description: Simple conf updating client	#
+#########################################################
+# -*- coding: UTF-8 -*-
 
-#************************************************#
-#                     sc                         #
-#           written by Remi Debay                #
-#                July 20, 2011                   #
-#                                                #
-#         Help managing config files.            #
-#************************************************#
+import logging	# Pour le log
+import argparse # Pour les arguments
+import os 	# Pour les separateurs et tests d existence
+import shutil 	# Pour la copie des fichiers
+import ConfigParser # Pour les fichiers de configuration
+import socket   # Pour recuprer le hostname
 
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+def parseopts():
+    parser = argparse.ArgumentParser(description='Get config from repository')
+    parser.add_argument('--level', dest='level', action='store_const',
+        const=logging.INFO, default=logging.getLogger().level,
+        help='Sets level output')
+    parser.add_argument('--debug', dest='level', action='store_const',
+        const=logging.DEBUG, default=logging.getLogger().level,
+        help='Sets debug output')
+    parser.add_argument('--dryrun', dest='dryrun', 
+        action='store_const', const=True, default=False,
+        help='Do not copy files')
+    parser.add_argument('--writeconf', dest='writeconf', 
+        action='store_const', const=True, default=False,
+        help='Writes given commands to configfile')
+    parser.add_argument('--config', dest='configfile',
+        help='Use file as config file') 
+    parser.add_argument('--rootdir', dest='root') 
+    parser.add_argument('--datadir', dest='data') 
+    parser.add_argument('--groups', dest='groups',
+         help='Sets current host groups') 
+    parser.add_argument('--mask', dest='masks',
+         help='Masks availables directories to list') 
+    args = parser.parse_args()
+    return args
 
-CONFIGFILENAME="sc.conf"
-GROUPFILENAME="groups"
-CONFIGDIR="/etc/simpleconf"
-CONFIG="$CONFIGDIR/$CONFIGFILENAME"
-
-if [ ! -f $CONFIG ]; then 
-    echo "Le fichier de configuration $CONFIG n'existe pas"
-    CONFIG="./$CONFIGFILENAME"
-    echo "utilisation de $CONFIG"
-    if [ ! -f $CONFIG ]; then
-        echo "Erreur : $CONFIG n'existe pas. "
-        exit -1
-    fi    
-fi
-
-groupfile="$CONFIGDIR/$GROUPFILENAME"
-
-directories="/etc /usr/local"
-
-. $CONFIG
-
-action="$1"
-
-function init {
-    function testsshconnect {
-        SSH="ssh -l $repouser $repohost "
-        $SSH -- ls $repopath
-        if [ ! "$?" -eq "0" ]; then
-            echo "connection impossible"
-            exit -1
-        fi
-
-        if [ ! -d $dest ]; then
-            echo "Le dossier local n'existe pas : $dest "
-            exit -2
-        fi
-    }
-    dest=$localrepo
-    testsshconnect
-    clone="/usr/bin/git clone "
-    $clone $repouser@$repohost:$repopath/ $dest
-}
-
-function update {
-    pull="/usr/bin/git pull"
-    dest="$localrepo"
-    if [ -d $dest ]; then
-         cd $dest
-         
-         $pull
-    else
-        echo "Le repertoire de destination $dest n'existe pas"
-        exit -3
-    fi
-}
-
-function apply {
-    function copy {
-        local s="$1"
-        local d="$2"
-        cp -vr $s $d
-    }
-
-    function copydirs {
-    local folder=$1
-    local subfolder=$2
-    if [ -n $folder ]; then
-        if [ -n $subfolder ]; then
-            for d in $directories; do
-    	    local s="$src/$folder/$subfolder/$d"
-            if [ -n $d ]; then
-                if [ -d $s ]; then
-                    copy  "$s/*" "$d"
-                else
-                    echo "$s n'existe pas"
-                fi
-            else
-                echo "$d n'existe pas"
-            fi
-            done
-            fi
-        fi
-    }
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+def copyfiles(src, dst, dryrun=True):
+    logging.debug("Starting copying folder " +src)
+    if not os.path.isdir(src):
+        logging.info(src + " does not exists")
+        return
+    initdir(dst, dryrun)
+    for l in os.listdir(src):
+        logging.debug("Copying " + l)
+        dpath = dst + os.sep + l
+        spath = src + os.sep + l
+        if os.path.isdir(spath):
+            copyfiles(spath, dpath)
+        if os.path.isfile(spath):
+            logging.info("Copying "+ src + " to " + dst )
+            if not dryrun :
+                shutil.copy2(src=spath, dst=dpath, dryrun=dryrun)
+        # Copying files
     
-    function copyhosts {
-        local hostsfolder="hosts"
-        local host=$(hostname)
-        copydirs $hostsfolder $host
-    }
-   
-    function copygroups {
-        groupsfolder="groups"
-        if [ -f $groupfile ]; then
-            for group in $(cat $groupfile); do
-                copydirs $groupsfolder $group
-            done
-        else
-            echo "Le fichier de groupes $groupfile n'existe pas"
-        fi
-    }
+#-------------------------------------
+# Description : Initializes a group dir
+#-------------------------------------
+def initgroupdir(mydir = None, mydatadir = None, dryrun = True) :
+    initdir( mydatadir + os.sep + mydir, dryrun)
 
-    src=$localrepo
+#-------------------------------------
+# Description : Creates dir if it does not exists 
+#-------------------------------------
+def initdir(mydir=None, dryrun = True) : 
+    if not os.path.isdir(mydir) :
+        logging.debug("mkdir "+ mydir)
+        if not dryrun :
+            logging.debug("mkdir "+ mydir)
+            os.makedirs(mydir)
+
+#-------------------------------------
+# Description : Loads config file 
+#-------------------------------------
+def loadconfigfile(args):
+    def readconf(parser, sect, option):
+        logging.debug("Reading " +sect + " - " + option )
+        value = None
+        try:
+            value = config.get(sect, option)
+            logging.info("Value " +sect + " - " + option +" = "+ value)
+        except ConfigParser.NoSectionError:
+            logging.error("Unknown section " + sect )
+        return value
+
+    configfile = args.configfile
+    logging.info("Loading config file from " + configfile)
+    config = ConfigParser.SafeConfigParser()
+    config.read(configfile)
+
+    args.level = readconf(config,"Logging","level")
+    args.data = readconf(config,"Directories","data")
+    args.root = readconf(config,"Directories","root")
+    args.groups = readconf(config,"Host","groups")
+    args.masks = readconf(config,"Host","masks")
     
-    copygroups
-    copyhosts
-}
+#-------------------------------------
+# Description : Writes given config to file 
+#-------------------------------------
+def writeconfig(conffile, args):
+    def write(config,sect,opt,val):
+        if val != None :
+            config.set(sect,opt,val)
+    logging.info("Writing configuration to file " + conffile)
+    config = ConfigParser.SafeConfigParser()
+    config.add_section("Logging")
+    config.add_section("Directories")
+    config.add_section("Host")
+    write(config,"Logging","level",str(args.level))
+    write(config,"Directories","root",args.root)
+    write(config,"Directories","data",args.data)
+    write(config,"Host","groups",args.groups)
+    write(config,"Host","masks",args.groups)
+    with open(conffile, 'wb') as configfile:
+        config.write(configfile)
 
-$action
+#-------------------------------------
+# Description : Main program function 
+#-------------------------------------
+def main(args = None):
+    logging.debug("Entering Main")
+
+    datadir=args.data
+    myroot=args.root
+    groups = args.groups
+    masks = args.masks
+
+    logging.info("Groupes : " + groups)
+
+    initdir(myroot)
+    initdir(datadir)
+    # Adding hostname to end of list
+    # Hostname acts as a group
+    groups = groups + " " + socket.gethostname()
+    for g in groups.split():
+        initgroupdir(g, datadir, dryrun = args.dryrun)
+        for m in masks.split():
+            src = datadir + os.sep + g + os.sep + m
+            dst = myroot + os.sep + m
+            copyfiles(src = src, dst = dst, dryrun = args.dryrun)
+
+try:
+    args=parseopts()
+    logging.getLogger().setLevel(args.level)
+    logging.debug("Staring...")
+    if args.writeconf :
+        writeconfig(args.configfile, args)
+    else :
+        if args.configfile:
+            loadconfigfile(args)
+        main(args)
+    logging.debug("Exiting")
+except KeyboardInterrupt as i :
+    logging.error("Stopping, received Ctrl+c")

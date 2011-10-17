@@ -1,0 +1,11 @@
+######
+# Howto use sc :
+######
+
+* Initialization writing configuration :
+sc  --writeconf --config /etc/sc/sc.conf \
+    --rootdir / --datadir /var/cache/sc \
+    --group "default server"
+
+* Using :
+sc  --config /etc/sc/sc.conf
