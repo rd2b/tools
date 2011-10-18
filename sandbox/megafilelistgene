@@ -38,4 +38,4 @@ def dyson(url=None, regexp=None):
         print(l)
 
 url = args.url
-dyson(url, REGEXP4SHARED)
+dyson(url, REGEXP)
