@@ -11,10 +11,16 @@ import argparse
 #Parse des arguments :
 parser = argparse.ArgumentParser()
 parser.add_argument('--url')
+parser.add_argument('--megaupload')
+parser.add_argument('--4shared')
 args = parser.parse_args()
 
-REGEXP=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
-REGEXP=r' ?(http://www.megaupload[^\'" ><,]+)'
+#REGEXP=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
+#REGEXPMEGAUPLOAD=r' ?(http://www.megaupload[^\'" ><,]+)'
+#REGEXP4SHARED=r'href=[\'"]?(http://www.4shared.com/file/[\'"<>]+)'
+
+REGEXP='http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+
 
 #-------------------------------------
 # Description : aspirage de la page
@@ -32,4 +38,4 @@ def dyson(url=None, regexp=None):
         print(l)
 
 url = args.url
-dyson(url, REGEXP)
+dyson(url, REGEXP4SHARED)
