@@ -1,0 +1,37 @@
+#!/bin/bash
+#########################################################
+#	Name: 	install		#
+#	Description: TODO	#
+#########################################################
+
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+function createdirs {
+    mkdir -m 750 /var/cache/sc
+    mkdir -m 750 /etc/sc
+
+    chown root:root /var/cache/sc
+    chown root:root /etc/sc
+} 
+
+#-------------------------------------
+# Description :  
+#-------------------------------------
+function  createrepo {
+
+} 
+
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+function copyexecfiles {
+    current=./
+    dst=/usr/local/bin"
+    
+    cp "$current/sc" $dst
+} 
+
+
+createdirs
+copyexecfiles

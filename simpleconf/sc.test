@@ -1,0 +1,33 @@
+#!/bin/env python
+#########################################################
+#	Name: 	sc.test		#
+#	Description: TODO	#
+#########################################################
+
+import sc
+import os
+import unittest
+
+class TestSCInitdirFunction(unittest.TestCase):
+    def setUp():
+        
+        self.testdir = "/tmp/scmytest"
+        if not os.isdir (self.testdir):
+            os.mkdir(self.testdir)
+
+    def test_empty():
+        dirs = os.listdirs("/tmp")
+        sc.initdir(mydir = "")
+        
+    def test_make():
+        mydir = self.testdir + os.sep + "tmyscdir"
+        self.assertFalse(os.isdir(mydir)
+        sc.initdir(mydir)
+        self.assertTrue(os.isdir(mydir)
+
+    def tearDown():
+        if os.isdir(self.testdir):
+            os.rmdir(self.testdir)
+
+if __name__ == '__main__':
+    unittest.main()
