@@ -27,7 +27,7 @@ function  createrepo {
 #-------------------------------------
 function copyexecfiles {
     current=./
-    dst=/usr/local/bin"
+    dst="/usr/local/bin"
     
     cp "$current/sc" $dst
 } 
