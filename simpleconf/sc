@@ -58,7 +58,7 @@ def copyfiles(src, dst, dryrun=True):
         if os.path.isfile(spath):
             logging.info("Copying "+ src + " to " + dst )
             if not dryrun :
-                shutil.copy2(src=spath, dst=dpath, dryrun=dryrun)
+                shutil.copy2(src=spath, dst = dpath )
         # Copying files
     
 #-------------------------------------
