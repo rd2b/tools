@@ -19,6 +19,7 @@ function createdirs {
 # Description :  
 #-------------------------------------
 function  createrepo {
+     ssh-copy-id git@rd2b.hd.free.fr
 
 } 
 
