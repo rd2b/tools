@@ -1,9 +1,11 @@
-#!/bin/bash
+#!/bin/bash -e
 #########################################################
 #	Name: 	r2ehandler				#
 #	Description: TODO				#
 #########################################################
 
+### Initialize collection
+# for i in `cat configuration/myemail2rss.conf |awk  "{print $1}"`; do  r2e add $i; done
 
 #-------------------------------------
 # Description : TODO 
@@ -11,8 +13,8 @@
 function handle {
     url=$1
     conffile=$2
-    email=$(grep $url $conffile | awk '{print $2}')
-    number=$(r2e list | grep $url | sed "s/://" | awk '{print $1}')
+    email=$(grep $url $conffile | awk '{print $2}' |head -1)
+    number=$(r2e list | grep $url | sed "s/://" | awk '{print $1}' |head -1)
 
     echo "email is $email and number is $number"
     r2e delete $number
@@ -31,3 +33,6 @@ for u in $urls; do
         handle $u $myfile
     fi       
 done
+
+#cleaning errors
+
