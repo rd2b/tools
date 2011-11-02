@@ -1,0 +1,33 @@
+#!/bin/bash
+#########################################################
+#	Name: 	r2ehandler				#
+#	Description: TODO				#
+#########################################################
+
+
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+function handle {
+    url=$1
+    conffile=$2
+    email=$(grep $url $conffile | awk '{print $2}')
+    number=$(r2e list | grep $url | sed "s/://" | awk '{print $1}')
+
+    echo "email is $email and number is $number"
+    r2e delete $number
+    r2e add $url $email
+} 
+
+
+myfile="$HOME/configuration/myemail2rss.conf"
+urls=`r2e list | sed 's/[(|)]/ /g'|sed 's/default:/ /g' | awk  '{ print($2,$3) }' | grep -v -f $myfile |  awk  '{ print($1) }'`
+
+
+
+for u in $urls; do
+    #checking if it is managed:
+    if ( grep -q $u $myfile ); then
+        handle $u $myfile
+    fi       
+done
