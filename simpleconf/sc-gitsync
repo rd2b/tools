@@ -1,1 +1,68 @@
 #!/bin/bash
+#########################################################
+#	Name: 	sc-gitsync				#
+#	Description: Synchronisation du depot simpleconf#
+#########################################################
+
+set -x 
+
+configfile="/etc/sc/sc.conf"
+
+#-------------------------------------
+# Description : Get simpleconf store
+#-------------------------------------
+function init {
+    function getconfig {
+        file=$1
+        d=$2
+        option=$3
+
+        ind=false
+        
+        while read l ; do
+            if [[ ! $ind && "$l" == "[$d]" ]]; then
+                echo "in domain $l"
+                ind=true
+            else
+                if [[ $ind && "$l" == [^$option = *]  ]]; then
+                    echo "found option !"
+                fi
+            fi
+        done < $file
+
+    }
+    getconfig "$configfile" "Host" "groups"
+} 
+
+#-------------------------------------
+# Description : update simpleconf store
+#-------------------------------------
+function update {
+    echo "update"
+} 
+
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+function usage {
+    echo "Syntax is :"
+    echo "$0 (option)"
+    echo "with option in :"
+    echo "     init : initialize sc directory"
+    echo "     update : updates sc directory from upstream"
+} 
+
+arg=$1
+case $arg in
+    "update")
+        $arg
+    ;;
+    "init")
+        $arg
+    ;;
+    *)
+        echo "Syntax error"
+        usage
+        exit 1
+    ;;
+esac
