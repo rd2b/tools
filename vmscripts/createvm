@@ -1,0 +1,23 @@
+#!/bin/bash -e
+ip=$1
+
+VMBUILDER=/usr/bin/vmbuilder
+MYVMTOOLDIR="/home/remi/Developpements/private-tools/vmscripts/"
+MYVMBOOTSCRIPT="$MYVMTOOLDIR/scripts/boot.sh"
+MYVMLOGINSCRIPT="$MYVMTOOLDIR/scripts/login.sh"
+NET="192.168.122"
+
+packagesoptions="--addpkg acpid --addpkg vim --addpkg git-core "
+
+sudo $VMBUILDER kvm ubuntu --suite lucid --flavour virtual --arch amd64 -o \
+         --verbose --libvirt qemu:///system \
+         --ip $ip --mask 255.255.255.0  --net $NET.0 \
+         --bcast $NET.255 --gw $NET.1 --dns 8.8.8.8 \
+         --part /home/remi/configuration/vmbuilder.partition \
+         --user remi --name "Remi" --pass remiremi \
+	 $packagesoptions \
+         --hostname $2   --lang=fr_FR.UTF-8 --timezone=UTC+0200 \
+	 --tmpfs - --firstboot $MYVMBOOTSCRIPT \
+         -d /home/virtualmachines/$2 \
+         --firstlogin $MYVMLOGINSCRIPT
+
