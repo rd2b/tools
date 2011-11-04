@@ -5,7 +5,7 @@
 #########################################################
 
 ### Initialize collection
-# for i in `cat configuration/myemail2rss.conf |awk  "{print $1}"`; do  r2e add $i; done
+# for i in `cat configuration/myemail2rss.conf |awk  '{print $1}'`; do  r2e add $i; done
 
 #-------------------------------------
 # Description : TODO 
@@ -16,9 +16,9 @@ function handle {
     email=$(grep $url $conffile | awk '{print $2}' |head -1)
     number=$(r2e list | grep $url | sed "s/://" | awk '{print $1}' |head -1)
 
-    echo "email is $email and number is $number"
-    r2e delete $number
-    r2e add $url $email
+    echo "$url : email is $email and number is $number"
+    test -n $number && r2e delete $number
+    test -n $url && test -n $email && r2e add $url $email
 } 
 
 
