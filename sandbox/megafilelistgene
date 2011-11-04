@@ -8,34 +8,69 @@
 import urllib, re
 import argparse
 
+#from sets import set
+
+
 #Parse des arguments :
 parser = argparse.ArgumentParser()
 parser.add_argument('--url')
-parser.add_argument('--megaupload')
-parser.add_argument('--4shared')
+parser.add_argument('--deep', default = 0, type=int )
 args = parser.parse_args()
 
 #REGEXP=r'href=[\'"]?(http://www.megaupload[^\'" >]+)'
 #REGEXPMEGAUPLOAD=r' ?(http://www.megaupload[^\'" ><,]+)'
 #REGEXP4SHARED=r'href=[\'"]?(http://www.4shared.com/file/[\'"<>]+)'
 
+#REGEXP FOR LINK:
 REGEXP='http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+
+excludelist =  set(['google', 'w3' ])
+
+
+def isexclude(l = "" , exlist = set()):
+    for ex in exlist:
+        if ex in l :
+#             print ex + " found in " +l
+             return True
+    return False
 
 
 #-------------------------------------
 # Description : aspirage de la page
 #-------------------------------------
-def dyson(url=None, regexp=None):
-    url = args.url
+def dyson(url = None, regexp = None, deep = 0, watched = set(), excludelist = set()):
     #Ouvrir l'url:
-    f = urllib.urlopen(url)
-    content = f.read()
+    try:
+        f = urllib.urlopen(url)
+        content = f.read()
 
-    #trouver tous les liens : 
-    match = re.findall(REGEXP,content)
-    #Print urls : 
-    for l in match :
-        print(l)
+        #trouver tous les liens : 
+        match = re.findall(REGEXP,content)
+        #Print urls : 
+        checked = []
+        for m in match :
+            checked.append(m)
+        checked.reverse()
+        for l in checked:
+            if len(watched)>0 and not l in watched :
+                watched.add(l)
+                if not isexclude (l, excludelist) and (deep > 0):
+                    d = deep - 1
+                    print l           
+                    dyson (url = l, regexp = regexp, deep = d, watched = watched , excludelist = excludelist)
+            
+    except IOError:
+        print "Error in " + url
+
+        
 
 url = args.url
-dyson(url, REGEXP)
+deep = args.deep
+print "my url is %s" % url
+print "my deeping is %s" % deep
+watched = set()
+watched.add(url)
+print watched
+dyson(url, REGEXP, deep, watched, excludelist)
+
+
