@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+
+<definitions name="Test"
+  targetNamespace="http://wsdl2py.client.pycon.org/"
+  xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:tns="http://wsdl2py.client.pycon.org/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <import namespace="http://wsdl2py.client.pycon.org/"
+          location="interface.wsdl"/>
+
+  <binding name="Binding" type="tns:Test">
+    <soap:binding style="rpc" 
+                      transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="echo">
+      <soap:operation soapAction="urn:Test#echo"/>
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:Test" use="encoded"/>
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:Test" use="encoded"/>
+      </output> 
+    </operation>
+    <operation name="add">
+      <soap:operation soapAction="urn:Test#add"/>
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:Test" use="encoded"/>
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:Test" use="encoded"/>
+      </output> 
+    </operation>
+  </binding>
+
+  <service name="TestService">
+    <documentation>Testing web service</documentation>
+    <port name="Test" binding="tns:Binding">
+      <soap:address location="http://127.0.0.1:8080/test.py"/>
+    </port>
+  </service>
+</definitions>
