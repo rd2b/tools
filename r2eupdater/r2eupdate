@@ -1,0 +1,38 @@
+#!/bin/bash -e
+#########################################################
+#	Name: 	r2ehandler				#
+#	Description: TODO				#
+#########################################################
+
+### Initialize collection
+# for i in `cat configuration/myemail2rss.conf |awk  '{print $1}'`; do  r2e add $i; done
+
+#-------------------------------------
+# Description : TODO 
+#-------------------------------------
+function handle {
+    url=$1
+    conffile=$2
+    email=$(grep $url $conffile | awk '{print $2}' |head -1)
+    number=$(r2e list | grep $url | sed "s/://" | awk '{print $1}' |head -1)
+
+    echo "$url : email is $email and number is $number"
+    test -n $number && r2e delete $number
+    test -n $url && test -n $email && r2e add $url $email
+} 
+
+
+myfile="$HOME/configuration/myemail2rss.conf"
+urls=`r2e list | sed 's/[(|)]/ /g'|sed 's/default:/ /g' | awk  '{ print($2,$3) }' | grep -v -f $myfile |  awk  '{ print($1) }'`
+
+
+
+for u in $urls; do
+    #checking if it is managed:
+    if ( grep -q $u $myfile ); then
+        handle $u $myfile
+    fi       
+done
+
+#cleaning errors
+

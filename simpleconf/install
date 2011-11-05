@@ -19,6 +19,7 @@ function createdirs {
 # Description :  
 #-------------------------------------
 function  createrepo {
+     ssh-copy-id git@rd2b.hd.free.fr
 
 } 
 
@@ -27,7 +28,7 @@ function  createrepo {
 #-------------------------------------
 function copyexecfiles {
     current=./
-    dst=/usr/local/bin"
+    dst="/usr/local/bin"
     
     cp "$current/sc" $dst
 } 
