@@ -1,0 +1,32 @@
+#!/bin/bash
+#########################################################
+#	Name: 	savegmail				#
+#	Description: Saves gmail account's email	#
+#########################################################
+MBSYNC=/usr/bin/mbsync
+MYCONF="$HOME/Gmail/gmailsync.rc"
+backdir="$HOME/Backups/Gmail"
+myaccount="mustbeset"
+quiet="no"
+
+while getopts "a:q" opt; do
+  case $opt in
+    q)
+      quiet="yes" >&2
+      ;;
+    a)
+      myaccount="$OPTARG"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+
+if [ "$quiet" == "yes" ]
+then
+    OPT="$OPT -q "
+fi
+
+$MBSYNC $OPT -c $MYCONF  $myaccount
