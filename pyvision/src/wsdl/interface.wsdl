@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<definitions name="PyVision"
+  targetNamespace="http://wsdl2py.client.pycon.org/"
+  xmlns="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:tns="http://wsdl2py.client.pycon.org/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <message name="EchoResponse">
+    <part name="Message" type="xsd:string"/>
+  </message>
+
+  <message name="EchoRequest">
+    <part name="Message" type="xsd:string"/>
+  </message>
+
+  <message name="AddResponse">
+    <part name="Result" type="xsd:number"/>
+  </message>
+
+  <message name="AddRequest">
+    <part name="One" type="xsd:number"/>
+    <part name="Two" type="xsd:number"/>
+  </message>
+
+  <portType name="PyVision">
+    <operation name="echo">
+      <input message="tns:EchoRequest"/>
+      <output message="tns:EchoResponse"/>
+    </operation>
+    <operation name="add">
+      <input message="tns:AddRequest"/>
+      <output message="tns:AddResponse"/>
+    </operation>
+  </portType>
+
+</definitions>
