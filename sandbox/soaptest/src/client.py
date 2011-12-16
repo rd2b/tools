@@ -13,8 +13,8 @@ def main():
     print 'Response: %s' % response['Message']
     one=1
     two=2
-    #response = server.add(One=one,Two=two)
-    response = server.add(One=one)
+    response = server.add(One=one,Two=two)
+    #response = server.add(One=one)
     print 'Response: %s' % response['Result']
 
 

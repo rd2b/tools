@@ -9,10 +9,13 @@ def echo(message):
     response._Message = message
     return response
 
-def add( one ):
+def add( operators ):
     response = AddResponse()
-    print one
-    response._Result = one
+    print operators
+    response._Result = 0
+    for o in operators:
+        op = operators[o]
+        response._Result += op
     return response
 
 if __name__ == '__main__':

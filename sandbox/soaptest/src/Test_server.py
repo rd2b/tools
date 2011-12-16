@@ -32,9 +32,11 @@ class AddRequest:
     def __init__(self, **kw):
         """Keyword parameters:
         One -- part One
+        Two -- part Two
         """
         self._One =  kw.get("One")
-AddRequest.typecode = Struct(pname=("urn:Test","add"), ofwhat=[ZSI.TC.AnyType(pname="One", aname="_One", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddRequest, encoded="urn:Test")
+        self._Two =  kw.get("Two")
+AddRequest.typecode = Struct(pname=("urn:Test","add"), ofwhat=[ZSI.TC.AnyType(pname="One", aname="_One", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.AnyType(pname="Two", aname="_Two", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddRequest, encoded="urn:Test")
 
 class AddResponse:
     def __init__(self, **kw):

@@ -23,7 +23,7 @@
 
   <message name="AddRequest">
     <part name="One" type="xsd:number"/>
-    <!--part name="Two" type="xsd:number"/-->
+    <part name="Two" type="xsd:number"/>
   </message>
 
   <portType name="Test">
