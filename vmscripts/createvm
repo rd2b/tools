@@ -7,7 +7,7 @@ MYVMBOOTSCRIPT="$MYVMTOOLDIR/scripts/boot.sh"
 MYVMLOGINSCRIPT="$MYVMTOOLDIR/scripts/login.sh"
 NET="192.168.122"
 
-packagesoptions="--addpkg acpid --addpkg vim --addpkg git-core "
+packagesoptions="--addpkg acpid --addpkg vim --addpkg git-core --addpkg etckeeper "
 
 sudo $VMBUILDER kvm ubuntu --suite lucid --flavour virtual --arch amd64 -o \
          --verbose --libvirt qemu:///system \
