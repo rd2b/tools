@@ -32,6 +32,9 @@
       <input>
         <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
                     namespace="urn:Test" use="encoded"/>
+
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:Test" use="encoded"/>
       </input>
       <output>
         <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"

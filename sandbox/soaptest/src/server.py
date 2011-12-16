@@ -9,11 +9,10 @@ def echo(message):
     response._Message = message
     return response
 
-def add(one):
+def add( one ):
     response = AddResponse()
     print one
-    #print two
-    response._result = one #+ two
+    response._Result = one
     return response
 
 if __name__ == '__main__':

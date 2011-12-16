@@ -11,8 +11,11 @@ def main():
     print ' Sending: %s' % MESSAGE
     response = server.echo(Message=MESSAGE)
     print 'Response: %s' % response['Message']
-    response = server.add(one=1)
-    print 'Response: %s' % response['result']
+    one=1
+    two=2
+    #response = server.add(One=one,Two=two)
+    response = server.add(One=one)
+    print 'Response: %s' % response['Result']
 
 
 if __name__ == '__main__':

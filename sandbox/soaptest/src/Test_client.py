@@ -71,15 +71,15 @@ EchoResponse.typecode = Struct(pname=("urn:Test","echoResponse"), ofwhat=[ZSI.TC
 class AddRequest:
     def __init__(self, **kw):
         """Keyword parameters:
-        result -- part result
+        One -- part One
         """
-        self._result =  kw.get("result")
-AddRequest.typecode = Struct(pname=("urn:Test","add"), ofwhat=[ZSI.TCnumbers.Iinteger(pname="result", aname="_result", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddRequest, encoded="urn:Test")
+        self._One =  kw.get("One")
+AddRequest.typecode = Struct(pname=("urn:Test","add"), ofwhat=[ZSI.TC.AnyType(pname="One", aname="_One", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddRequest, encoded="urn:Test")
 
 class AddResponse:
     def __init__(self, **kw):
         """Keyword parameters:
-        one -- part one
+        Result -- part Result
         """
-        self._one =  kw.get("one")
-AddResponse.typecode = Struct(pname=("urn:Test","addResponse"), ofwhat=[ZSI.TCnumbers.Iinteger(pname="one", aname="_one", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddResponse, encoded="urn:Test")
+        self._Result =  kw.get("Result")
+AddResponse.typecode = Struct(pname=("urn:Test","addResponse"), ofwhat=[ZSI.TC.AnyType(pname="Result", aname="_Result", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=AddResponse, encoded="urn:Test")
