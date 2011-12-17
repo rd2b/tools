@@ -40,6 +40,8 @@ def isexclude(l = "" , exlist = set()):
 #-------------------------------------
 def dyson(url = None, regexp = None, deep = 0, watched = set(), excludelist = set()):
     #Ouvrir l'url:
+    if deep < 0 :
+        return None      
     try:
         f = urllib.urlopen(url)
         content = f.read()
@@ -48,15 +50,12 @@ def dyson(url = None, regexp = None, deep = 0, watched = set(), excludelist = se
         match = re.findall(REGEXP,content)
         #Print urls : 
         checked = []
-        for m in match :
-            checked.append(m)
-        checked.reverse()
-        for l in checked:
-            if len(watched)>0 and not l in watched :
+        for l in match :
+            if deep >=0 and not l in watched and not isexclude (l, excludelist):
                 watched.add(l)
-                if not isexclude (l, excludelist) and (deep > 0):
-                    d = deep - 1
-                    print l           
+                d = deep - 1
+                print l
+                if deep >= 0 :
                     dyson (url = l, regexp = regexp, deep = d, watched = watched , excludelist = excludelist)
             
     except IOError:

@@ -1,0 +1,19 @@
+#!/bin/bash
+#########################################################
+#	Name: 	random		#
+#	Description: TODO	#
+#########################################################
+
+function random {
+    local range=$1
+    typeset -i range 
+
+    number=$RANDOM
+    let "number %= $range"
+
+    echo $number
+}
+
+random 12
+random 12
+
