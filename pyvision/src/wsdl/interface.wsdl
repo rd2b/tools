@@ -26,6 +26,19 @@
     <part name="Two" type="xsd:number"/>
   </message>
 
+ <message name="SendResponse">
+    <part name="Message" type="xsd:string"/>
+  </message>
+
+  <message name="SendRequest">
+    <part name="Date" type="xsd:string"/>
+    <part name="Sender" type="xsd:string"/>
+    <part name="Reference" type="xsd:string"/>
+    <part name="Message" type="xsd:string"/>
+    <part name="Priority" type="xsd:number"/>
+  </message>
+
+
   <portType name="PyVision">
     <operation name="echo">
       <input message="tns:EchoRequest"/>
@@ -34,6 +47,10 @@
     <operation name="add">
       <input message="tns:AddRequest"/>
       <output message="tns:AddResponse"/>
+    </operation>
+    <operation name="send">
+      <input message="tns:SendRequest"/>
+      <output message="tns:SendResponse"/>
     </operation>
   </portType>
 

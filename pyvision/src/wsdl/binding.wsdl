@@ -41,6 +41,17 @@
                     namespace="urn:PyVision" use="encoded"/>
       </output> 
     </operation>
+    <operation name="send">
+      <soap:operation soapAction="urn:PyVision#send"/>
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:PyVision" use="encoded"/>
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:PyVision" use="encoded"/>
+      </output> 
+    </operation>
   </binding>
 
   <service name="PyVisionService">
