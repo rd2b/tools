@@ -29,7 +29,7 @@ alerts_table = Table('alerts', metadata,
 
 mapper(Alert, alerts_table) 
 
-class Db:
+class Db(object):
     engine = None
     session = None
     def __init__(self):
@@ -51,17 +51,13 @@ class Db:
     def commit(self):
         return self.session.commit()
 
+##Exemples :
+a = Alert()
 db = Db()
 db.create_engine('sqlite:///:memory:')
 db.create_session()
-
-a = Alert(date='Date')
-print a.id
-print a.date
-
 db.getSession().add(a)
 myalert = db.getSession().query(Alert).first() 
 db.getSession().commit()
+print myalert
 
-print a.date
-print a.id
