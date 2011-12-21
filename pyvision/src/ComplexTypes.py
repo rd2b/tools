@@ -13,5 +13,5 @@ class Alert(object):
         self.priority = priority
 
     def __repr__(self):
-        return "<Alert('%s','%s', '%s')>" % (self.date,
+        return "<Alert('%s','%s', '%s','%s','%s')>" % (self.date,
                self.sender, self.reference, self.message, str(self.priority))
