@@ -22,7 +22,7 @@ args = parser.parse_args()
 #REGEXP4SHARED=r'href=[\'"]?(http://www.4shared.com/file/[\'"<>]+)'
 
 #REGEXP FOR LINK:
-REGEXP='http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+REGEXP='http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&:+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 excludelist =  set(['google', 'w3' ])
 
