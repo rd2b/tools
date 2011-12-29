@@ -1,0 +1,87 @@
+#!/bin/bash
+#################################################################
+#	Name: 	gmegasave					#
+#	Description: Saves and encrypts a file to megaupload	#
+#################################################################
+
+set -u
+set -e
+
+quiet=false
+file=""
+key=""
+description=""
+  
+#-------------------------------------  
+# Description : prints help message  
+#-------------------------------------  
+function help_app() {  
+    $quiet && exit -1  
+
+    cat >&2 << EOF
+Usage $0 [option]  
+Tars, gzips, encrypts and finally uploads a file to megaupload
+      
+Options are:  
+    -f, file or directory to save,
+    -k, gpg key to encrypt with,
+    -a, login and pass for your megaupload account (login:password),
+    -d, description to append to the file,
+    -q, quiet (no output to stdout),
+    -h, display this help  
+EOF
+
+    exit -1  
+}  
+  
+#-------------------------------------  
+# Description : logs messages to output  
+#-------------------------------------  
+function log()  
+{  
+    message="$1"  
+    $quiet || echo "$message"  
+}  
+  
+
+#-------------------------------------
+# Description : Saves a file to megaupload
+#-------------------------------------
+function save {
+    local f="$1"
+    local key="$2"
+    local lp="$3"
+    local desc="$4"
+    [ -e $f ] || log "Le fichier/repertoire n'existe pas"
+    [ -n $key ] || log "La cle est necessaaire"
+    [ -n $lp ] || log "Le couple login:password est necessaire"
+
+    ENTETE="Save from $0 script - "
+
+    tempfile="/tmp/mysave$$.tmp.tgz.gpg"
+    rm -f $tempfile
+    
+    tar -zcf - $f  |  gpg -r $key --encrypt -o $tempfile
+    plowup megaupload -a $lp -d "$ENTETE$desc" $tempfile
+    
+    rm -f $tempfile
+
+} 
+  
+while getopts hqf:k:a:d: opt  
+do  
+    case "$opt" in  
+        f) file="$OPTARG";;
+        k) key="$OPTARG";;
+	a) loginpass="$OPTARG";;
+	d) description="$OPTARG";;
+        q) quiet=true ;;
+        h)  help_app;;  
+        \?) help_app;;  
+    esac  
+done  
+
+log "Saving $file with key $key"
+save "$file" "$key" "$loginpass" "$description"
+
+
