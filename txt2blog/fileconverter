@@ -1,4 +1,8 @@
 #!/bin/bash
+#################################################################
+#	Name: 	txt2blog					#
+#	Description: Convertie des fichiers txt en code html	#
+#################################################################
 
 function convert {
     txt2tags=`which txt2tags`
