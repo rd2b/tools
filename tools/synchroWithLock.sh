@@ -15,7 +15,7 @@ scriptName="synchroWithLock.sh"
 pidfile="/tmp/$scriptName.pid.inprogress"
 facility=local1
 
-RSYNC_DATA_LOGFILE=/var/log/$scriptname.log
+RSYNC_DATA_LOGFILE=/var/log/$scriptName.log
 RSYNCTIMEOUT=5
 RSYNCSSHTIMEOUT="ssh -o ConnectTimeout=5"
 RSYNCIGNORELIST=""
