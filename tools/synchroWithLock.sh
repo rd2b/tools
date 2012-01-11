@@ -15,7 +15,7 @@ scriptName="synchroWithLock.sh"
 pidfile="/tmp/$scriptName.pid.inprogress"
 facility=local1
 
-RSYNC_DATA_LOGFILE=/var/log/$scriptName.log
+RSYNC_DATA_LOGFILE=/tmp/$scriptName.log
 RSYNCTIMEOUT=5
 RSYNCSSHTIMEOUT="ssh -o ConnectTimeout=5"
 RSYNCIGNORELIST=""
@@ -114,7 +114,6 @@ log "Starting sync from $from to $to"
 
 if rsync -e "$RSYNCSSHTIMEOUT" \
                 --timeout=$RSYNCTIMEOUT \
-                --exclude $RSYNCIGNORELIST \
                 --exclude "lost+found" \
                 --temp-dir="$RSYNCTEMPDIR" \
                 --recursive \
