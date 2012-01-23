@@ -52,6 +52,18 @@
                     namespace="urn:PyVision" use="encoded"/>
       </output> 
     </operation>
+
+    <operation name="getalerts">
+      <soap:operation soapAction="urn:PyVision#getalerts"/>
+      <input>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:PyVision" use="encoded"/>
+      </input>
+      <output>
+        <soap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+                    namespace="urn:PyVision" use="encoded"/>
+      </output> 
+    </operation>
   </binding>
 
   <service name="PyVisionService">
