@@ -22,6 +22,7 @@ alerts_table = Table('alerts', metadata,
    Column('id', Integer, Sequence('alert_id_seq'), primary_key=True),
    Column('sender', String(100)),
    Column('reference', String(100)),
+   Column('host', String(255)),
    Column('message', String(255)),
    Column('date', String(20)),
    Column('priority', Integer)

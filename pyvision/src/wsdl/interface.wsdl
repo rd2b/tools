@@ -34,6 +34,7 @@
     <part name="Date" type="xsd:string"/>
     <part name="Sender" type="xsd:string"/>
     <part name="Reference" type="xsd:string"/>
+    <part name="Host" type="xsd:string"/>
     <part name="Message" type="xsd:string"/>
     <part name="Priority" type="xsd:number"/>
   </message>

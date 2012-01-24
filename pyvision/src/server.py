@@ -33,6 +33,7 @@ def send( alert ):
     a = Alert( date = alert['Date'],
                sender = alert['Sender'],
                reference = alert['Reference'],
+               host = alert['Host'],
                message = alert['Message'],
                priority = alert['Priority'])
     if Worker.registeralert(a) :
