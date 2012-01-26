@@ -15,6 +15,10 @@ class TestComplexTypes(unittest.TestCase):
         logging.debug("Initializing variables ")
         self.control = Control()
 
+    def test_Initialisation(self):
+        c = Control()
+        a = Alert()
+
     def test_Empty(self):
         logging.info("Testing ")
         self.control.seconds = None
