@@ -6,7 +6,7 @@
 
 
 from ZSI import ServiceProxy
-import ComplexTypes
+from ComplexTypes import Control
 
 import sys
 import logging
@@ -16,15 +16,18 @@ import ConfigParser
 from datetime import datetime, timedelta
 
 MESSAGE = "Hello from Python!"
-DEFAULTCONFIGFILE="./configfile"
+DEFAULTCONFIGFILE="/etc/pyvision/configfile"
 
 def readCommandFile(path=""):
+    logging.debug("Reading path "+ path)
     if not path:
+        logging.warn("Invalid path %s" % path)
         return None
     parser = ConfigParser.ConfigParser()
     parser.read(path)
     section = "Command"
     if not parser.has_section(section):
+        logging.warn("Section %s not found in %s"%(section,path))
         return None
     c = Control()
     starting = parser.get(section,"starting")
@@ -34,7 +37,29 @@ def readCommandFile(path=""):
     c.seconds=(re.match("\number+",seconds))
 
     c.command = parser.get(section,"command")
+    logging.debug("Found Control:\n %s\n%s\n%s" % (c.starting,c.seconds,c.command))
+    
+    return c
 
+def getCommands(path=None, extension=".pv"):
+    import os
+    if not path or not os.path.isdir(path):
+        return None
+    entries = os.listdir(path)
+    logging.debug("Entries in %s:%s"%(path,entries))
+    commands = []
+    for e in entries:
+        myfile = path + os.sep + e
+        if os.path.splitext(myfile)[1] == extension :
+            command = readCommandFile(path=myfile)
+            if command :
+                commands.append(command)
+        else :
+            logging.info("%s is not a valid configfile"% myfile)
+    print commands   
+    return None
+    
+    
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
@@ -44,13 +69,27 @@ def main():
     parser.add_argument("-c", "--configfile", dest="configfile", type=str)
     args = parser.parse_args()
 
-    if not args.configfile : 
-        args.configfile = DEFAULTCONFIGFILE
-    configparser = ConfigParser.ConfigParser()
-    configparser.read('args.configfile')
+    if not args.configfile:
+        configfile = DEFAULTCONFIGFILE 
+    else:
+        configfile = args.configfile 
+    logging.info("Using configfile %s"%configfile)
 
+    try:
+        section = "PyVision"
+        configparser = ConfigParser.ConfigParser()
+        configparser.read(configfile)
+        logging.debug(str(configparser.sections()))
+        commandsdir = configparser.get(section,"commandsdir")
+        extension = configparser.get(section,"extension")
+    except ConfigParser.NoSectionError as nse:
+        logging.error(nse)
+        return 401
+    logging.info("Using commands files in %s with exetnsion %s" \
+			% (commandsdir, extension))
 
-    logging.info("Using Config file = %s", str(args.configfile)) 
+    getCommands(commandsdir, extension)
+    return 0
 
     nsdict = { 'types' : 'http://pycon.org/typs' }
     server = ServiceProxy.ServiceProxy( './wsdl/binding.wsdl')

@@ -1,0 +1,4 @@
+[Command]
+starting=
+seconds=60
+command="df"
