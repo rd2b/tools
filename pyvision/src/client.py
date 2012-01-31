@@ -14,6 +14,7 @@ import argparse
 import ConfigParser
 
 from datetime import datetime, timedelta
+from collections import deque
 
 MESSAGE = "Hello from Python!"
 DEFAULTCONFIGFILE="/etc/pyvision/configfile"
@@ -33,13 +34,22 @@ def readCommandFile(path=""):
     starting = parser.get(section,"starting")
     seconds = parser.get(section,"seconds")
     import re
-    c.starting=(re.match("[\d|/\|:|\s]+",starting))
-    c.seconds=(re.match("\number+",seconds))
+    logging.debug("starting %s, seconds, %s"%(starting,seconds))
+    try:
+        if starting and starting != "" :
+            c.starting=datetime.strptime(starting,"%Y-%m-%d %H:%M")
+    except ValueError as err:
+        logging.warn(err)
+
+    m = re.match('(\d+)',str(seconds)) 
+    if m :
+        c.seconds = int(m.group(1))
 
     c.command = parser.get(section,"command")
-    logging.debug("Found Control:\n %s\n%s\n%s" % (c.starting,c.seconds,c.command))
+    logging.debug("Found Control:\n%s\n%s\n%s" % (c.starting,c.seconds,c.command))
     
     return c
+
 
 def getCommands(path=None, extension=".pv"):
     import os
@@ -56,10 +66,21 @@ def getCommands(path=None, extension=".pv"):
                 commands.append(command)
         else :
             logging.info("%s is not a valid configfile"% myfile)
-    print commands   
+
+    logging.debug("Ordering list for execution")
+    print commands
+    commands.sort()
+    print commands
+    
     return None
     
-    
+def orderCommands(mylist=None,control=None):
+    if not mylist:
+        mylist=list()
+    if control:
+        mylist.append(control)
+        mylist.sort()
+    return mylist
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)

@@ -9,6 +9,7 @@ import logging
 from datetime import datetime, timedelta
 
 from ComplexTypes import Control
+from ComplexTypes import Alert
 
 class TestComplexTypes(unittest.TestCase):
     def setUp(self):
