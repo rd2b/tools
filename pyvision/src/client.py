@@ -20,11 +20,6 @@ from collections import deque
 MESSAGE = "Hello from Python!"
 DEFAULTCONFIGFILE = "/etc/pyvision/configfile"
 
-def readCommandFile(path=""):
-    c = Control(path=path)
-    return c
-
-
 def getCommands(path=None, extension=".pv"):
     import os
     if not path or not os.path.isdir(path):
@@ -35,16 +30,16 @@ def getCommands(path=None, extension=".pv"):
     for e in entries:
         myfile = path + os.sep + e
         if os.path.splitext(myfile)[1] == extension :
-            command = readCommandFile(path=myfile)
+            command = Control(path=myfile)
             if command :
                 commands.append(command)
         else :
             logging.info("%s is not a valid configfile"% myfile)
 
     logging.debug("Ordering list for execution")
-    print commands
+    logging.debug("Before :%s"% commands)
     commands.sort()
-    print commands
+    logging.debug("After :%s"% commands)
     
     return commands
     
