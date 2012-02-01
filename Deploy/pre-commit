@@ -1,4 +1,4 @@
-#!/usr/local/bin/python                                                                                                                                  
+#!/usr//bin/python
 """
 A pre-commit hook for git that uses Pylint for automated code review.
  
@@ -66,7 +66,6 @@ def main():
     else:
         sys.exit(0)
  
-                                                                                                                                                             
 def is_py_script(filename):
     """Returns True if a file is a python executable."""
     if not os.access(filename, os.X_OK):
