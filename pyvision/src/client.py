@@ -6,7 +6,7 @@
 
 
 from ZSI import ServiceProxy
-from ComplexTypes import Control
+from ComplexTypes import Control, Alert
 
 import sys
 import logging
@@ -14,40 +14,14 @@ import argparse
 import ConfigParser
 
 from datetime import datetime, timedelta
+import time
 from collections import deque
 
 MESSAGE = "Hello from Python!"
-DEFAULTCONFIGFILE="/etc/pyvision/configfile"
+DEFAULTCONFIGFILE = "/etc/pyvision/configfile"
 
 def readCommandFile(path=""):
-    logging.debug("Reading path "+ path)
-    if not path:
-        logging.warn("Invalid path %s" % path)
-        return None
-    parser = ConfigParser.ConfigParser()
-    parser.read(path)
-    section = "Command"
-    if not parser.has_section(section):
-        logging.warn("Section %s not found in %s"%(section,path))
-        return None
-    c = Control()
-    starting = parser.get(section,"starting")
-    seconds = parser.get(section,"seconds")
-    import re
-    logging.debug("starting %s, seconds, %s"%(starting,seconds))
-    try:
-        if starting and starting != "" :
-            c.starting=datetime.strptime(starting,"%Y-%m-%d %H:%M")
-    except ValueError as err:
-        logging.warn(err)
-
-    m = re.match('(\d+)',str(seconds)) 
-    if m :
-        c.seconds = int(m.group(1))
-
-    c.command = parser.get(section,"command")
-    logging.debug("Found Control:\n%s\n%s\n%s" % (c.starting,c.seconds,c.command))
-    
+    c = Control(path=path)
     return c
 
 
@@ -72,15 +46,70 @@ def getCommands(path=None, extension=".pv"):
     commands.sort()
     print commands
     
-    return None
+    return commands
     
-def orderCommands(mylist=None,control=None):
-    if not mylist:
-        mylist=list()
-    if control:
-        mylist.append(control)
-        mylist.sort()
-    return mylist
+def execute(control):
+    if not control: 
+        return None
+    command = control.command
+    if not command:
+        return None
+    
+    import shlex, subprocess
+    args = shlex.split(command)
+    logging.info("Excuting %s:"%command)
+    logging.debug("Arguments %s:"%args)
+    p = subprocess.Popen(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    returncode = p.wait()
+    output = p.stdout.read() + p.stderr.read()
+    logging.info("Result : %s"%output)
+    return (output, returncode)
+    
+def convertToAlert(control, result):
+    if not control or not result:
+        return none
+    alert = Alert(date = str(datetime.now()),
+          sender = "",
+          reference = "",
+          host = "",
+          message = result[0],
+          priority = result[1])
+    return alert
+
+def send(alert):
+    if not alert:
+         return None
+    nsdict = { 'types' : 'http://pycon.org/typs' }
+    server = ServiceProxy.ServiceProxy( './wsdl/binding.wsdl')
+    response = server.send( Date = alert.date,
+                            Sender = alert.sender,
+                            Reference = alert.reference,
+                            Host = alert.host,
+                            Message = alert.message,
+                            Priority = alert.priority)
+    logging.info("Got response : %s"% response)
+
+def run(mycontrols = None):
+    def runControl(myc = None):
+        logging.info("Initializing new control: %s"%myc)
+        if not myc:
+            return None
+        logging.info("Initializing new control: %s"%myc)
+        while True:
+           schd = myc.schedule()
+           dt = schd - datetime.now()
+           time.sleep(dt.total_seconds())
+           logging.info("Executing new control: %s"%myc)
+           result = execute(myc)
+           logging.debug("Result = '%s', Code = '%s' "%(result[0],result[1]))
+           send(convertToAlert(control = myc, result = result))
+           
+   
+    from multiprocessing import Process
+    for c in mycontrols:
+        p = Process(target=runControl, args=(c,))
+        p.start()
+
 
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
@@ -109,7 +138,7 @@ def main():
     logging.info("Using commands files in %s with exetnsion %s" \
 			% (commandsdir, extension))
 
-    getCommands(commandsdir, extension)
+    run(getCommands(commandsdir, extension))
     return 0
 
     nsdict = { 'types' : 'http://pycon.org/typs' }
