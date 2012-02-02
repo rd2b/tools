@@ -2,6 +2,8 @@
 from datetime import datetime, timedelta
 
 import logging
+import re
+import ConfigParser
 
 class Alert(object):
     id = None
@@ -31,14 +33,12 @@ class Control(object):
                        seconds = 0,
                        reference = "defaultreference", 
                        command = ""):
-       self.starting = starting
-       self.seconds = seconds
-       self.reference = reference
-       self.command = command
+        self.starting = starting
+        self.seconds = seconds
+        self.reference = reference
+        self.command = command
 
     def __init__(self, path=""):
-        import re
-        import ConfigParser
         logging.debug("Reading path "+ path)
         if not path:
             logging.warn("Invalid path %s" % path)
@@ -46,47 +46,62 @@ class Control(object):
         parser = ConfigParser.ConfigParser()
         parser.read(path)
         if not parser.has_section(self._commandsection):
-            logging.warn("Section %s not found in %s"%
-                            (self._commandsection,path))
+            logging.warn("Section "+ self._commandsection +
+                            " not found in "+ path)
             return None
-        starting = parser.get(self._commandsection,"starting")
-        seconds = parser.get(self._commandsection,"seconds")
-        if parser.has_option(self._commandsection,"reference"):
-            self.reference = str(parser.get(self._commandsection,"reference"))
+        starting = parser.get(self._commandsection, "starting")
+        seconds = parser.get(self._commandsection, "seconds")
+        command = parser.get(self._commandsection, "command")
+        if parser.has_option(self._commandsection, "reference"):
+            reference = str(parser.get(self._commandsection, "reference"))
+            self.setreference(reference)
         else :
-            self.reference = "default"
-        logging.debug("starting %s, seconds, %s"%(starting,seconds))
+            self.setreference("default")
+        logging.debug("starting "+ starting +", seconds, "+ seconds)
+
+        self.setstarting(starting)
+        self.setseconds(seconds)
+        self.setcommand(command)
+
+        logging.debug("Found Control:%s" % self)
+
+    def setstarting(self, starting):
         try:
             if starting and starting != "" :
-                self.starting = datetime.strptime(starting,"%Y-%m-%d %H:%M")
+                self.starting = datetime.strptime(starting, "%Y-%m-%d %H:%M")
             else:
                 self.starting = None
         except ValueError as err:
             logging.warn(err)
+            self.starting = None
 
-        m = re.match('(\d+)',str(seconds))
-        if m:
-             self.seconds = int(m.group(1))
+    def setseconds(self, seconds):
+        matched = re.match('(\d+)', str(seconds))
+        if matched:
+            self.seconds = int(matched.group(1))
         else:
             self.seconds = 0
 
-        self.command = parser.get(self._commandsection,"command")
-        logging.debug("Found Control:%s" % self)
+    def setreference(self, reference):
+        self.reference = reference
+
+    def setcommand(self, command):
+        self.command = command
 
     def __gt__(self, other):
-       me = self.schedule()
-       y = other.schedule()
-       return me > y
+        myschedule = self.schedule()
+        otherschedule = other.schedule()
+        return myschedule > otherschedule
 
-    def __eq__(self,other):
-       me = self.schedule()
-       y = other.schedule()
-       return me == y
+    def __eq__(self, other):
+        myschedule = self.schedule()
+        otherschedule = other.schedule()
+        return myschedule == otherschedule
 
     def __lt__(self, other):
-       me = self.schedule()
-       y = other.schedule()
-       return me < y
+        myschedule = self.schedule()
+        otherschedule = other.schedule()
+        return myschedule < otherschedule
     
     def __repr__(self):
         return "<Control('%s', '%s', '%s', '%s')>" % (self.starting,
@@ -110,17 +125,18 @@ class Control(object):
 
         nextexecution = self.starting
         if self.seconds and self.seconds > 0 :
-             dt = now - nextexecution
-             multi = dt.total_seconds() // self.seconds
-             logging.debug("Total:%s multi:%s seconds:%s" 
-		%(dt.total_seconds(), multi, self.seconds))
-             delta = timedelta(seconds = self.seconds * multi + self.seconds)
-             nextexecution = nextexecution + delta
+            delta = now - nextexecution
+            multi = delta.total_seconds() // self.seconds
+            logging.debug("Total:"+str(delta.total_seconds())+
+                             " multi:"+ str(multi) +
+                             " seconds:"+ str(self.seconds))
+            delta = timedelta(seconds = self.seconds * multi + self.seconds)
+            nextexecution = nextexecution + delta
 
-             delta = timedelta(seconds = self.seconds )
-             while nextexecution < now and delta:
-                 nextexecution = nextexecution + delta
-        logging.debug("Next execution %s for %s"%(nextexecution,self._next))
+            delta = timedelta(seconds = self.seconds )
+            while nextexecution < now and delta:
+                nextexecution = nextexecution + delta
+        logging.debug("Next execution %s for %s"%(nextexecution, self._next))
         self._next = nextexecution
         return nextexecution
 
