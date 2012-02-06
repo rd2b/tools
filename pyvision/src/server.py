@@ -10,7 +10,7 @@ from PyVision_server import GetAlertsResponse
 
 from ComplexTypes import Alert
 
-import Worker
+from Worker import Worker
 
 def echo(message):
     response = EchoResponse()
@@ -35,7 +35,8 @@ def send( alert ):
                priority = alert['Priority'])
     response = SendResponse()
     try:
-        Worker.registeralert(alertobject)
+        myworker = Worker()
+        myworker.registeralert(alertobject)
         response._Message = "OK"
     except Exception as error:
         logging.warn("Got error while registering alert")
@@ -57,7 +58,6 @@ def getalerts(Message = None):
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
     logging.info("Starting...")
-    Worker.init()
     dispatch.AsServer(port=8080)
     logging.info("Exiting...")
 

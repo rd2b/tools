@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #########################################################
-#	Name: 	dbhandler.py		#
-#	Description: TODO	#
+#	Name: 	dbhandler.py				#
+#	Description: Handles database objects		#
 #########################################################
 # -*- coding: UTF-8 -*-
 
@@ -31,6 +31,21 @@ ALERTS_TABLE = Table('alerts', METADATA,
 mapper(Alert, ALERTS_TABLE) 
 
 class DbHandler(object):
+    """
+Handles a Database object
+Example :
+alert = Alert()
+dbhandler = DbHandler()
+dbhandler.createengine(url = 'sqlite:///:memory:')
+session = dbhandler.createsession()
+try:
+    session.add(alert)
+    myalert = dbhandler.getsession().query(Alert).first() 
+    dbhandler.getsession().commit()
+    print myalert
+except Exception as exc:
+    print exc
+   """
     engine = None
     session = None
     def __init__(self):
@@ -44,26 +59,15 @@ class DbHandler(object):
         if self.engine != None :
             mysessionmaker = sessionmaker(bind = self.engine)
             self.session = mysessionmaker()
-	    return self.session
+            return self.session
 
     def getsession(self):
         if not self.session :
-            self.create_session()
+            self.createsession()
         return self.session
 
     def commit(self):
         self.session.commit()
 
 ##Exemples :
-alert = Alert()
-dbhandler = DbHandler()
-dbhandler.createengine(url = 'sqlite:///:memory:')
-session = dbhandler.createsession()
-try:
-    session.add(alert)
-    myalert = dbhandler.getsession().query(Alert).first() 
-    dbhandler.getsession().commit()
-    print myalert
-except Exception as exc:
-    print exc
 
