@@ -9,7 +9,6 @@ from PyVision_server import SendResponse
 from PyVision_server import GetAlertsResponse
 
 from ComplexTypes import Alert
-from db import Db
 
 import Worker
 
@@ -22,39 +21,41 @@ def add( operators ):
     response = AddResponse()
     print operators
     response._Result = 0
-    for o in operators:
-        op = operators[o]
-        response._Result += op
+    for operator in operators:
+        response._Result += operators[operator]
     return response
 
 def send( alert ):
-    response = SendResponse()
-    logging.info( "My alert is : " + str(alert))
-    a = Alert( date = alert['Date'],
+    logging.info("My alert is : " + str(alert))
+    alertobject = Alert( date = alert['Date'],
                sender = alert['Sender'],
                reference = alert['Reference'],
                host = alert['Host'],
                message = alert['Message'],
                priority = alert['Priority'])
-    if Worker.registeralert(a) :
+    response = SendResponse()
+    try:
+        Worker.registeralert(alertobject)
         response._Message = "OK"
-    else:
+    except Exception as error:
+        logging.warn("Got error while registering alert")
+        logging.info(error)
         response._Message = "KO"
-    print response._Message
     return response
 
 def getalerts(Message = None):
     logging.debug("Asking for alerts.")
-    response=GetAlertsResponse()
+    response = GetAlertsResponse()
     alerts = Worker.getalerts()
     response._Message = ""
-    for a in alerts:
-        response._Message += str(a) + "\n"
+    for alert in alerts:
+        response._Message += str(alert) + "\n"
     logging.debug("Sending alerts : " + response._Message)
     return response
     
 
 def main():
+    logging.getLogger().setLevel(logging.DEBUG)
     logging.info("Starting...")
     Worker.init()
     dispatch.AsServer(port=8080)
@@ -62,3 +63,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

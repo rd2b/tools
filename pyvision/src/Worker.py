@@ -6,37 +6,41 @@
 # -*- coding: UTF-8 -*-
 
 from ComplexTypes import Alert
-from db import Db
+from dbhandler import DbHandler
 
 class g:
     mydb = None
 
 def init():
-    g.mydb = Db()
-    g.mydb.create_engine('sqlite:///:memory:')
-    g.mydb.create_session()
+    g.mydb = DbHandler()
+    g.mydb.createengine('sqlite:///:memory:')
+    g.mydb.createsession()
 
 def registeralert(alert = None):
     if alert is None :
         return False
-    g.mydb.create_session()
-    g.mydb.getSession().add(alert)
-    g.mydb.getSession().commit()
+    print alert
+    g.mydb = DbHandler()
+    g.mydb.createengine('sqlite:///:memory:')
+    session = g.mydb.createsession()
+    print alert
+    session.add(alert)
+    session.commit()
     return True
 
 def getalerts(message = None):
-    g.mydb.create_session()
-    alerts = g.mydb.getSession().query(Alert)
+    g.mydb.createsession()
+    alerts = g.mydb.getsession().query(Alert)
     return alerts
 
 def registeralert(alert = None):
     if alert is None :
         return False
     try :
-        g.mydb.create_session()
-        g.mydb.getSession().add(alert)
-        g.mydb.getSession().commit()
-        myalert = g.mydb.getSession().query(Alert).first()
+        g.mydb.createsession()
+        g.mydb.getsession().add(alert)
+        g.mydb.getsession().commit()
+        myalert = g.mydb.getsession().query(Alert).first()
         print myalert.date
         return True
     except :

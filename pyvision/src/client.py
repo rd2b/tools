@@ -6,7 +6,7 @@
 #########################################################
 
 
-from ZSI import ServiceProxy
+from ZSI.ServiceProxy import ServiceProxy
 from ComplexTypes import Control, Alert
 
 import time
@@ -77,13 +77,18 @@ def converttoalert(control, result):
 def send(alert):
     if not alert:
         return None
-    server = ServiceProxy.ServiceProxy( './wsdl/binding.wsdl')
-    response = server.send( Date = alert.date,
-                            Sender = alert.sender,
-                            Reference = alert.reference,
-                            Host = alert.host,
-                            Message = alert.message,
-                            Priority = alert.priority)
+    server = ServiceProxy( wsdl='./wsdl/binding.wsdl')
+    logging.debug("Sending "+str(alert))
+    one=1
+    two=2
+    response = server.add(One=one,Two=two)
+    logging.info("Got response : "+ str( response))
+    response = server.send( Date = "",
+                            Sender = "",
+                            Reference = "",
+                            Host ="",
+                            Message = "",
+                            Priority = 0)
     logging.info("Got response : "+ str( response))
 
 def run(mycontrols = None):
@@ -157,4 +162,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt as kint:
+        logging.error(kint)
