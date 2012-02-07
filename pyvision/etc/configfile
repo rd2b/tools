@@ -1,0 +1,3 @@
+[PyVision]
+commandsdir=/etc/pyvision/commands
+extension=.pv

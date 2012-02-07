@@ -52,15 +52,17 @@ class SendRequest:
         Date -- part Date
         Sender -- part Sender
         Reference -- part Reference
+        Host -- part Host
         Message -- part Message
         Priority -- part Priority
         """
         self._Date =  kw.get("Date")
         self._Sender =  kw.get("Sender")
         self._Reference =  kw.get("Reference")
+        self._Host =  kw.get("Host")
         self._Message =  kw.get("Message")
         self._Priority =  kw.get("Priority")
-SendRequest.typecode = Struct(pname=("urn:PyVision","send"), ofwhat=[ZSI.TC.String(pname="Date", aname="_Date", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Sender", aname="_Sender", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Reference", aname="_Reference", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.AnyType(pname="Priority", aname="_Priority", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendRequest, encoded="urn:PyVision")
+SendRequest.typecode = Struct(pname=("urn:PyVision","send"), ofwhat=[ZSI.TC.String(pname="Date", aname="_Date", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Sender", aname="_Sender", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Reference", aname="_Reference", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Host", aname="_Host", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.AnyType(pname="Priority", aname="_Priority", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendRequest, encoded="urn:PyVision")
 
 class SendResponse:
     def __init__(self, **kw):
@@ -69,6 +71,22 @@ class SendResponse:
         """
         self._Message =  kw.get("Message")
 SendResponse.typecode = Struct(pname=("urn:PyVision","sendResponse"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendResponse, encoded="urn:PyVision")
+
+class GetAlertsRequest:
+    def __init__(self, **kw):
+        """Keyword parameters:
+        Message -- part Message
+        """
+        self._Message =  kw.get("Message")
+GetAlertsRequest.typecode = Struct(pname=("urn:PyVision","getalerts"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=GetAlertsRequest, encoded="urn:PyVision")
+
+class GetAlertsResponse:
+    def __init__(self, **kw):
+        """Keyword parameters:
+        Message -- part Message
+        """
+        self._Message =  kw.get("Message")
+GetAlertsResponse.typecode = Struct(pname=("urn:PyVision","getalertsResponse"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=GetAlertsResponse, encoded="urn:PyVision")
 
 
 # Service Skeletons
@@ -99,4 +117,11 @@ class PyVisionService(ServiceSOAPBinding):
 
     soapAction['urn:PyVision#send'] = 'soap_send'
     root[(SendRequest.typecode.nspname,SendRequest.typecode.pname)] = 'soap_send'
+
+    def soap_getalerts(self, ps, **kw):
+        request = ps.Parse(GetAlertsRequest.typecode)
+        return request,GetAlertsResponse()
+
+    soapAction['urn:PyVision#getalerts'] = 'soap_getalerts'
+    root[(GetAlertsRequest.typecode.nspname,GetAlertsRequest.typecode.pname)] = 'soap_getalerts'
 

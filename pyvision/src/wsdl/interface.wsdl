@@ -34,10 +34,18 @@
     <part name="Date" type="xsd:string"/>
     <part name="Sender" type="xsd:string"/>
     <part name="Reference" type="xsd:string"/>
+    <part name="Host" type="xsd:string"/>
     <part name="Message" type="xsd:string"/>
     <part name="Priority" type="xsd:number"/>
   </message>
 
+  <message name="GetAlertsResponse">
+    <part name="Message" type="xsd:string"/>
+  </message>
+
+  <message name="GetAlertsRequest">
+    <part name="Message" type="xsd:string"/>
+  </message>
 
   <portType name="PyVision">
     <operation name="echo">
@@ -51,6 +59,10 @@
     <operation name="send">
       <input message="tns:SendRequest"/>
       <output message="tns:SendResponse"/>
+    </operation>
+    <operation name="getalerts">
+      <input message="tns:GetAlertsRequest"/>
+      <output message="tns:GetAlertsResponse"/>
     </operation>
   </portType>
 
