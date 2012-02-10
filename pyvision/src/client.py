@@ -142,25 +142,6 @@ def main():
 
     run(getcommands(commandsdir, extension))
 
-#
-#    print ' Sending: %s' % MESSAGE
-#    response = server.echo(Message = MESSAGE)
-#    print 'Response: %s' % response['Message']
-#    one=1
-#    two=2
-#    response = server.add(One=one,Two=two)
-#    print 'Response: %s' % response['Result']
-#    response = server.send( Date = '2011/12/17',
-#                            Sender = 'tekos@test.net',
-#                            Reference = 'disk',
-#                            Host = "ref01.prod.test.net",
-#                            Message = 'Free space on /var/log < 20% ',
-#                            Priority = 0)
-#    print response
-#    response = server.getalerts(Message = "Gimme")
-#    print response
-
-
 if __name__ == '__main__':
     try:
         main()
