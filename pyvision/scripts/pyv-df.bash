@@ -15,6 +15,6 @@ ret=0
 [[ $warn -lt $total ]] && ret=1
 [[ $critic -lt $total ]] && ret=2
 
-
+echo "Filesys $filesys used:$total, warn:$warn, critic:$critic"
 
 exit $ret 
