@@ -63,6 +63,17 @@ class BindingSOAP:
         response = self.binding.Receive(typecode)
         return response
 
+    # op: getalerts
+    def getalerts(self, request, **kw):
+        if isinstance(request, GetAlertsRequest) is False:
+            raise TypeError, "%s incorrect request type" % (request.__class__)
+        # no input wsaction
+        self.binding.Send(None, None, request, soapaction="urn:PyVision#getalerts", encodingStyle="http://schemas.xmlsoap.org/soap/encoding/", **kw)
+        # no output wsaction
+        typecode = Struct(pname=None, ofwhat=GetAlertsResponse.typecode.ofwhat, pyclass=GetAlertsResponse.typecode.pyclass)
+        response = self.binding.Receive(typecode)
+        return response
+
 class EchoRequest:
     def __init__(self, **kw):
         """Keyword parameters:
@@ -103,15 +114,17 @@ class SendRequest:
         Date -- part Date
         Sender -- part Sender
         Reference -- part Reference
+        Host -- part Host
         Message -- part Message
         Priority -- part Priority
         """
         self._Date =  kw.get("Date")
         self._Sender =  kw.get("Sender")
         self._Reference =  kw.get("Reference")
+        self._Host =  kw.get("Host")
         self._Message =  kw.get("Message")
         self._Priority =  kw.get("Priority")
-SendRequest.typecode = Struct(pname=("urn:PyVision","send"), ofwhat=[ZSI.TC.String(pname="Date", aname="_Date", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Sender", aname="_Sender", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Reference", aname="_Reference", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.AnyType(pname="Priority", aname="_Priority", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendRequest, encoded="urn:PyVision")
+SendRequest.typecode = Struct(pname=("urn:PyVision","send"), ofwhat=[ZSI.TC.String(pname="Date", aname="_Date", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Sender", aname="_Sender", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Reference", aname="_Reference", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Host", aname="_Host", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True), ZSI.TC.AnyType(pname="Priority", aname="_Priority", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendRequest, encoded="urn:PyVision")
 
 class SendResponse:
     def __init__(self, **kw):
@@ -120,3 +133,19 @@ class SendResponse:
         """
         self._Message =  kw.get("Message")
 SendResponse.typecode = Struct(pname=("urn:PyVision","sendResponse"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=SendResponse, encoded="urn:PyVision")
+
+class GetAlertsRequest:
+    def __init__(self, **kw):
+        """Keyword parameters:
+        Message -- part Message
+        """
+        self._Message =  kw.get("Message")
+GetAlertsRequest.typecode = Struct(pname=("urn:PyVision","getalerts"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=GetAlertsRequest, encoded="urn:PyVision")
+
+class GetAlertsResponse:
+    def __init__(self, **kw):
+        """Keyword parameters:
+        Message -- part Message
+        """
+        self._Message =  kw.get("Message")
+GetAlertsResponse.typecode = Struct(pname=("urn:PyVision","getalertsResponse"), ofwhat=[ZSI.TC.String(pname="Message", aname="_Message", typed=False, encoded=None, minOccurs=1, maxOccurs=1, nillable=True)], pyclass=GetAlertsResponse, encoded="urn:PyVision")

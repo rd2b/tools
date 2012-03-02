@@ -1,23 +1,53 @@
-#!/bin/bash -e
-ip=$1
+#!/bin/bash 
+
+set -e
+set -u
 
 VMBUILDER=/usr/bin/vmbuilder
-MYVMTOOLDIR="/home/remi/Developpements/private-tools/vmscripts/"
+MYVMTOOLDIR="/home/remi/Developpements/tools/vmscripts/"
 MYVMBOOTSCRIPT="$MYVMTOOLDIR/scripts/boot.sh"
 MYVMLOGINSCRIPT="$MYVMTOOLDIR/scripts/login.sh"
+MYPARTITIONSCHEME="$MYVMTOOLDIR/partitions/vmbuilder.partition"
+MYVMDIR="/home/virtualmachines/"
+packagesoptions=" --addpkg acpid --addpkg vim --addpkg git-core --addpkg etckeeper --addpkg bash-completion"
+
 NET="192.168.122"
 
-packagesoptions="--addpkg acpid --addpkg vim --addpkg git-core --addpkg etckeeper "
+function usage {
+	cat >&2 <<- EOF 
+	usage : 
+	    $0 "myhostname.acgform.local" "192.168.122.1"
+	Where :
+	    - "myhostname.acgform.local" is my vm hostname,
+	    - "1" is my vm ip 192.168.122.1
+	EOF
+	exit 1
+}
+
+hostname=${1:-""}
+ip=${2:-""}
+
+[ -n "$ip" ] || usage 
+[ -n "$hostname" ] || usage 
 
 sudo $VMBUILDER kvm ubuntu --suite lucid --flavour virtual --arch amd64 -o \
-         --verbose --libvirt qemu:///system \
-         --ip $ip --mask 255.255.255.0  --net $NET.0 \
-         --bcast $NET.255 --gw $NET.1 --dns 8.8.8.8 \
-         --part /home/remi/configuration/vmbuilder.partition \
-         --user remi --name "Remi" --pass remiremi \
-	 $packagesoptions \
-         --hostname $2   --lang=fr_FR.UTF-8 --timezone=UTC+0200 \
-	 --tmpfs - --firstboot $MYVMBOOTSCRIPT \
-         -d /home/virtualmachines/$2 \
-         --firstlogin $MYVMLOGINSCRIPT
+         --verbose --libvirt qemu:///system 				\
+         --ip $ip --mask 255.255.255.0  --net $NET.0 			\
+         --bcast $NET.255 --gw $NET.1 --dns 8.8.8.8 			\
+         --part "$MYPARTITIONSCHEME" 					\
+         --user remi --name "Remi" --pass remiremi 			\
+	 $packagesoptions 						\
+         --hostname $hostname   --lang=fr_FR.UTF-8 --timezone=UTC+0200 	\
+	 --tmpfs - --firstboot $MYVMBOOTSCRIPT 				\
+         -d "$MYVMDIR/$hostname" 					\
+         --firstlogin $MYVMLOGINSCRIPT || { 
+    echo "An error occured while building $hostname"
+    exit 1
+}
+sudo su -c "echo \"$ip $hostname\" >> /etc/hosts"
+echo "$hostname build at $ip"
+sudo virsh start $hostname
+sleep 1m
 
+
+exit 0

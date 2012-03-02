@@ -1,21 +1,30 @@
-#!/usr/bin/env python
+#!/usr/bin/env  python
 #########################################################
-#	Name: 	Worker.py		#
-#	Description: TODO	#
+#	Name:  	Worker.py				#
+#	Description:  Action worker			#
 #########################################################
-# -*- coding: UTF-8 -*-
+#  -*- coding: UTF-8 -*-
 
-from ComplexTypes import Alert
-from db import Db
+from  ComplexTypes import Alert
+from  dbhandler import DbHandler
 
-def registeralert(alert = None):
-    if alert = None :
-        return False
-    g.mydb.create_session()
-    g.mydb.getSession().add(a)
-    g.mydb.getSession().commit()
-    myalert = g.mydb.getSession().query(Alert).first()
-    print myalert.date
-    response._Message = "OK"
-    return response
+class  Worker(object):
+    """ Interacts with database"""
+    mydb = None
+
+    def __init__(self):
+        self.mydb = DbHandler()
+        self.mydb.createengine(url = 'sqlite:///:memory:')
+
+    def registeralert(self, alert = None):
+        if alert is None :
+            return False
+        session = self.mydb.getsession()
+        session.add(alert)
+        session.commit()
+        return True
+
+    def  getalerts(self):
+        alerts = self.mydb.getsession().query(Alert)
+        return alerts
 
