@@ -9,7 +9,7 @@ MYVMBOOTSCRIPT="$MYVMTOOLDIR/scripts/boot.sh"
 MYVMLOGINSCRIPT="$MYVMTOOLDIR/scripts/login.sh"
 MYPARTITIONSCHEME="$MYVMTOOLDIR/partitions/vmbuilder.partition"
 MYVMDIR="/home/virtualmachines/"
-packagesoptions=" --addpkg acpid --addpkg vim --addpkg git-core --addpkg etckeeper "
+packagesoptions=" --addpkg acpid --addpkg vim --addpkg git-core --addpkg etckeeper --addpkg bash-completion"
 
 NET="192.168.122"
 
@@ -24,8 +24,8 @@ function usage {
 	exit 1
 }
 
-ip=${1:-""}
-hostname=${2:-""}
+hostname=${1:-""}
+ip=${2:-""}
 
 [ -n "$ip" ] || usage 
 [ -n "$hostname" ] || usage 
@@ -44,6 +44,10 @@ sudo $VMBUILDER kvm ubuntu --suite lucid --flavour virtual --arch amd64 -o \
     echo "An error occured while building $hostname"
     exit 1
 }
-
+sudo su -c "echo \"$ip $hostname\" >> /etc/hosts"
 echo "$hostname build at $ip"
+sudo virsh start $hostname
+sleep 1m
+
+
 exit 0
