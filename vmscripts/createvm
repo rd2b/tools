@@ -30,15 +30,15 @@ ip=${2:-""}
 [ -n "$ip" ] || usage 
 [ -n "$hostname" ] || usage 
 
-sudo $VMBUILDER kvm ubuntu --suite lucid --flavour virtual --arch amd64 -o \
-         --verbose --libvirt qemu:///system 				\
+sudo $VMBUILDER kvm ubuntu --suite oneiric --flavour virtual --arch amd64 -o \
+         --debug -m 512 --verbose --libvirt qemu:///system 			\
          --ip $ip --mask 255.255.255.0  --net $NET.0 			\
          --bcast $NET.255 --gw $NET.1 --dns 8.8.8.8 			\
-         --part "$MYPARTITIONSCHEME" 					\
+         --part "$MYPARTITIONSCHEME"                                    \
          --user remi --name "Remi" --pass remiremi 			\
 	 $packagesoptions 						\
          --hostname $hostname   --lang=fr_FR.UTF-8 --timezone=UTC+0200 	\
-	 --tmpfs - --firstboot $MYVMBOOTSCRIPT 				\
+	 --firstboot $MYVMBOOTSCRIPT 				\
          -d "$MYVMDIR/$hostname" 					\
          --firstlogin $MYVMLOGINSCRIPT || { 
     echo "An error occured while building $hostname"
