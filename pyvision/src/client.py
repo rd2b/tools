@@ -21,7 +21,7 @@ from datetime import datetime
 from multiprocessing import Process
 
 MESSAGE = "Hello from Python!"
-DEFAULTCONFIGFILE = "/etc/pyvision/configfile"
+DEFAULTCONFIGFILE = "../etc/configfile"
 
 def getcommands(path=None, extension=".pv"):
     if not path or not os.path.isdir(path):
