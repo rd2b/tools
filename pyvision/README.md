@@ -8,6 +8,9 @@ It aims to be easyer to use, easyer to maintain and better documented.
 
 Installation
 ------------
+To use pyvision on Debian, you will need:
+   apt-get install python-argparse python-zsi
+
 
 Usage
 -----
