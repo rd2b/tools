@@ -11,3 +11,7 @@ Installation
 
 Usage
 -----
+
+Original ACGVision:
+Please visit ACGCenter : acgcenter.com
+ACGVision project page : https://launchpad.net/acgvision-project
