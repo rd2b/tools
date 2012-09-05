@@ -1,0 +1,5 @@
+root 5000
+swap 512
+---
+/var 2000
+/var/log 2000
