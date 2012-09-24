@@ -6,6 +6,10 @@
 
 import sys,os,xmpp,time
 
+tojid=sys.argv[1]
+text=' '.join(sys.argv[2:])
+
+
 def sendmessage(client, recipient, message):
     id = client.send(xmpp.protocol.Message(recipient,message))
     print 'sent message with id',id
@@ -22,8 +26,6 @@ if len(sys.argv) < 2:
     print "Syntax: xsend JID text"
     sys.exit(0)
 
-tojid=sys.argv[1]
-text=' '.join(sys.argv[2:])
 
 jidparams={}
 if os.access(os.environ['HOME']+'/.xsend',os.R_OK):
@@ -57,7 +59,7 @@ print 'authenticated using',auth
 #cl.SendInitPresence(requestRoster=0)   # you may need to uncomment this for old server
 sendmessage(cl, tojid, "I am online")
 sendmessage(cl, tojid, text)
-cl.RegisterHandler('messageHandler',messageConsummer)
+cl.RegisterHandler('message',messageConsummer)
 
 while 1:
     cl.Process(1)
