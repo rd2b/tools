@@ -7,8 +7,9 @@
 
 import sys,os,xmpp,time
 
-tojid=sys.argv[1]
-text=' '.join(sys.argv[2:])
+action=sys.argv[1]
+tojid=sys.argv[2]
+text=' '.join(sys.argv[3:])
 
 
 def sendmessage(client, recipient, message):
@@ -58,13 +59,14 @@ if not auth:
 print 'authenticated using',auth
 
 #cl.SendInitPresence(requestRoster=0)   # you may need to uncomment this for old server
-sendmessage(cl, tojid, "I am online")
-sendmessage(cl, tojid, text)
-cl.RegisterHandler('message',messageConsummer)
 
-while 1:
-    cl.Process(1)
-
+if ( action == "send" ):
+    sendmessage(cl, tojid, text)
+elif ( action == "receive"):
+    sendmessage(cl, tojid, "I am on line")
+    cl.RegisterHandler('message',messageConsummer)
+    while 1:
+        cl.Process(1)
 
 time.sleep(1)   # some older servers will not send the message if you disconnect immediately after sending
 
