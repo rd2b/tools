@@ -3,6 +3,7 @@
 #   Name:   jabberhandler.py     #
 #   Description: TODO   #
 #########################################################
+# Read http://xmpppy.sourceforge.net/examples/xsend.py
 
 import sys,os,xmpp,time
 
