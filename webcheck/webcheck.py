@@ -19,6 +19,7 @@ from threading import Thread
 from Queue import Queue
 
 class UrlCheck():
+    """ Handle a single url and its keywords """
     def __init__(self, url, timeout = 2):
         self.url = url
         self.timeout = timeout
@@ -26,13 +27,16 @@ class UrlCheck():
         self.available = False
 
     def addkeyword(self, keyword):
+        """ Add keyword to list """
         self.keywords[keyword] = False
 
     def finded(self, keyword):
+        """ Sets a keyword to finded """
         logging.info("%s found at %s.", keyword, self.url)
         self.keywords[keyword] = True
 
     def missing(self, keyword):
+        """ Sets a keyword to missing (default is missing for unchecked) """
         logging.info("%s missing at %s.", keyword, self.url)
         self.keywords[keyword] = False
 
@@ -45,14 +49,17 @@ class UrlCheck():
             })
 
     def markavailable(self):
+        """ Sets URL as available """
         logging.info("%s available.", self.url)
         self.available = True
 
     def markunavailable(self):
+        """ Sets URL as not available """
         logging.info("%s unavailable.", self.url)
         self.available = False
 
     def runcheck(self):
+        """ Connects to URL, and check if keywords are found """
         logging.info("Checking {0}".format(self.url))
         try:
             openned = urllib2.urlopen( self.url, timeout = self.timeout )
@@ -72,6 +79,7 @@ class UrlCheck():
             self.markunavailable()
 
     def repport (self):
+        """ Sets a keyword to finded """
         message = ""
         if self.available:
             message = "{0} available.".format(self.url)
