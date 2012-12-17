@@ -34,10 +34,10 @@ class UrlCheck():
 
     def __str__(self):
         return str({ 
-            url : self.url, 
-            available : str(self.available),
-            timeout : str(self.timeout),
-            keywords : str(self.keywords)
+            "url" : self.url, 
+            "available" : str(self.available),
+            "timeout" : str(self.timeout),
+            "keywords" : str(self.keywords)
             })
 
     def markavailable(self):
@@ -51,7 +51,7 @@ class UrlCheck():
         try:
             openned = urllib2.urlopen( self.url, timeout = self.timeout )
             self.markavailable()
-            content = openned.read();
+            content = openned.read()
 
             for keyword in self.keywords.keys():
                 logging.info("Checking {0} with keyword {1}".format(
@@ -61,7 +61,7 @@ class UrlCheck():
                 else:
                     self.missing(keyword)
         except ValueError:
-            logging.error("Not a valid URL " + url)
+            logging.error("Not a valid URL %s.", url)
         except IOError:
             self.markunavailable()
 
@@ -110,8 +110,7 @@ class Checker():
         self.urls[url].addkeyword(keyword)
 
     def __str__(self):
-        urls = str(self.urls)
-        return str((urls, keywords))
+        return str(self.urls)
 
     def tohtml(self):
         message = self.report(html = True)
@@ -130,7 +129,7 @@ class Checker():
         return response
 
     def check(self, url):
-       if url in self.urls:
+        if url in self.urls:
             self.queue.put(self.urls[url])
 
     def worker(self):
@@ -141,7 +140,7 @@ class Checker():
             checker.runcheck()
             self.queue.task_done()
 
-    def checkall(self, workers = 6 ):
+    def checkall(self ):
         logging.info("Starting check")
 
         for url in self.urls.values():
@@ -178,10 +177,10 @@ class WebServer:
 
 def main():
     """ Default main function """
-    FORMAT = "%(asctime)s %(message)s"
+    myformat = "%(asctime)s %(message)s"
     logging.basicConfig(
             level = logging.INFO,
-            format = FORMAT)
+            format = myformat)
 
     logging.info("Program starting...")
 
