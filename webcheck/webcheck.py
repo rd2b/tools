@@ -1,15 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 """ webcheck.py : Description """
 
 __author__ = "R 2b"
 __date__ = "2012/12/06"
 
-
 import argparse
 import urllib2
 
+import logging
+
+
 import cherrypy
+
+from threading import Thread
+from Queue import Queue
 
 class UrlCheck():
     def __init__(self, url, timeout = 2):
@@ -42,20 +47,21 @@ class UrlCheck():
         self.available = False
 
     def runcheck(self):
-        print "Checking " + self.url
+        logging.info("Checking {0}".format(self.url))
         try:
             openned = urllib2.urlopen( self.url, timeout = self.timeout )
             self.markavailable()
             content = openned.read();
 
             for keyword in self.keywords.keys():
-                print "Checking " + self.url + " with keyword " +keyword
+                logging.info("Checking {0} with keyword {1}".format(
+                    self.url, keyword))
                 if keyword in content:
                     self.finded(keyword)
                 else:
                     self.missing(keyword)
         except ValueError:
-            print "Not a valid URL " + url
+            logging.error("Not a valid URL " + url)
         except IOError:
             self.markunavailable()
 
@@ -67,7 +73,7 @@ class UrlCheck():
             message = "{0} not available.".format(self.url)
 
         for keyword in self.keywords.keys():
-            print self.keywords
+            print(self.keywords)
             if self.keywords[keyword]:
                 message += "{0} found with correct keyword '{1}'.".format(
                         self.url, keyword)
@@ -77,13 +83,23 @@ class UrlCheck():
         return message
  
 
+
+
 class Checker():
     """ Checks if keywords are in given urls """
 
-    def __init__(self ):
+    def __init__(self, workers = 5 ):
         self.urls = {}
-        self.keywords = {}
+        self.workers = []
         self.times = {}
+        self.queue = Queue()
+
+        for workerid in range(workers):
+            newworker = Thread(target = self.worker)
+            logging.debug("Thread %s started", workerid)
+            newworker.daemon = True
+            newworker.start()
+            self.workers.append(newworker)
 
     def add(self, url):
         if ( url not in self.urls and not url == "" ):
@@ -99,7 +115,7 @@ class Checker():
 
     def tohtml(self):
         message = self.report(html = True)
-        print message
+        logging.debug(message)
         return message
 
     def schedulenext(self):
@@ -115,12 +131,26 @@ class Checker():
 
     def check(self, url):
        if url in self.urls:
-           self.urls[url].runcheck()
+            self.queue.put(self.urls[url])
 
-    def checkall(self ):
+    def worker(self):
+        while True:
+            logging.debug("I am waiting for tasks.")
+            checker = self.queue.get()
+            logging.debug("I am working on task.")
+            checker.runcheck()
+            self.queue.task_done()
+
+    def checkall(self, workers = 6 ):
+        logging.info("Starting check")
+
         for url in self.urls.values():
-            print url
-            url.runcheck()
+            logging.debug("Sending %s to task queue.", url)
+            self.queue.put(url)
+
+        if not ( len(self.urls) == 0 and self.queue.empty() ):
+            self.queue.join()
+        logging.info("Ending check")
 
 class WebServer:
     def __init__(self, checker):
@@ -148,6 +178,13 @@ class WebServer:
 
 def main():
     """ Default main function """
+    FORMAT = "%(asctime)s %(message)s"
+    logging.basicConfig(
+            level = logging.INFO,
+            format = FORMAT)
+
+    logging.info("Program starting...")
+
     # parse command line options
     parser = argparse.ArgumentParser(description="Checks if urls are fine")
     parser.add_argument(
