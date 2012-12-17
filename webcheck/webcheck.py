@@ -8,6 +8,8 @@ __date__ = "2012/12/06"
 import argparse
 import urllib2
 
+import sys
+
 import logging
 
 
@@ -27,9 +29,11 @@ class UrlCheck():
         self.keywords[keyword] = False
 
     def finded(self, keyword):
+        logging.info("%s found at %s.", keyword, self.url)
         self.keywords[keyword] = True
 
     def missing(self, keyword):
+        logging.info("%s missing at %s.", keyword, self.url)
         self.keywords[keyword] = False
 
     def __str__(self):
@@ -41,9 +45,11 @@ class UrlCheck():
             })
 
     def markavailable(self):
+        logging.info("%s available.", self.url)
         self.available = True
 
     def markunavailable(self):
+        logging.info("%s unavailable.", self.url)
         self.available = False
 
     def runcheck(self):
@@ -61,7 +67,7 @@ class UrlCheck():
                 else:
                     self.missing(keyword)
         except ValueError:
-            logging.error("Not a valid URL %s.", url)
+            logging.error("Not a valid URL %s.", self.url)
         except IOError:
             self.markunavailable()
 
@@ -129,8 +135,10 @@ class Checker():
         return response
 
     def check(self, url):
+        logging.info("Checking single url: %s", url)
         if url in self.urls:
             self.queue.put(self.urls[url])
+        self.queue.join()
 
     def worker(self):
         while True:
@@ -191,6 +199,11 @@ def main():
         type=str, default='', action='append', help='Url to check')
     parser.add_argument(
         '-U', '--urls', type=str, default="", help='Url to check' )
+    parser.add_argument(
+        '--webui', action='store_true', help='Starts a web user interface' )
+    parser.add_argument(
+            '--stdin', action='store_true', 
+            help='Read input from stdin as "http://myurl.net,keyword"' )
     args = parser.parse_args()
 
     checker = Checker()
@@ -206,9 +219,20 @@ def main():
             checker.addkeyword(arr[0], arr[1])
 
     checker.checkall()
-    cherrypy.quickstart(WebServer(checker))
+
+    if args.webui:
+        logging.info("Starting the web ui.")
+        cherrypy.quickstart(WebServer(checker))
 
 
+    if args.stdin:
+        for line in sys.stdin:
+            logging.info("New url added %s", line)
+            arr = line.split(",")
+            checker.add(arr[0])
+            if (len(arr) == 2):
+                checker.addkeyword(arr[0], arr[1])
+            checker.check(arr[0])
 
 if __name__ == "__main__":
     main()
