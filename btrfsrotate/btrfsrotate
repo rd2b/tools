@@ -34,14 +34,71 @@ function log {
     $quiet || echo "$(date +"%F %T" ) $PROGNAME: $message" 
 }
 
+function die {
+    local exitcode="$1"
+    local message="$2"
+
+    log "Error" "$message"
+
+    exit $exitcode
+}
+
+# Makes snapshots rotation
+function rotate {
+    local snaplocation="$1"
+    local volume="$2"
+    local maxrotations="$3"
+    local tag="$4"
+
+    local volumename=`basename $volume`
+
+
+    [ -d "$snaplocation" ] || \
+        mkdir $snaplocation || \
+        die "1" "Cannot create $snaplocation"
+
+    # Drops oldest max rotation:
+    [ -e $snaplocation/$volumename-$tag-$maxrotations ] && \
+        btrfs subvolume delete $snaplocation/$volumename-$tag-$maxrotations
+
+    for i in `seq $maxrotations -1 1`
+    do
+        let "new=i+1"
+        [ -e $snaplocation/$volumename-$tag-$i ] && \
+            mv $snaplocation/$volumename-$tag-$i $snaplocation/$volumename-$tag-$new
+    done
+
+    return 0
+}
+
+# Makes snapshot
+function snapit {
+    local snaplocation="$1"
+    local volume="$2"
+    local tag="$3"
+
+    local volumename=`basename $volume`
+
+
+    [ ! -e "$snaplocation/$volumename-$tag-1" ] || \
+        die "2" "$snaplocation/$volumename-$tag-1 already exists"
+    btrfs subvolume snapshot \
+        $volume $snaplocation/$volumename-$tag-1
+}
+
+directory="notset"
+count=10
+tag="default"
+
+
 while getopts "b:c:t:qh" opt
 do
     case $opt in
-        b)  directory=$OPTARG
+        b)  directory="$OPTARG"
             ;;
-        c)  count=$OPTARG
+        c)  count="$OPTARG"
             ;;
-        t)  tag=$OPTARG
+        t)  tag="$OPTARG"
             ;;
         q)  quiet=true
             ;;
@@ -54,6 +111,9 @@ do
     esac
 done  
 
-echo $option
+echo $directory
 
+rotate "$directory/.snapshots" "$directory" "$count" "$tag"
+
+snapit "$directory/.snapshots" "$directory" "$tag"
 
