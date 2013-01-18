@@ -15,7 +15,14 @@ function showhelp {
     cat >&2 <<- EOF 
 Usage: $PROGNAME [OPTION] ...
 Options:
+    -b  btrfs directory to rotate
+    -c  max rotations to keep
+    -t  adds tag to snapshotname
     -h  prints this help message.
+
+Example:
+    $PROGNAME -b /data -c 12 -t monthly 
+    $PROGNAME -b /data -c 7 -t daily
 EOF
 }
 
@@ -27,10 +34,14 @@ function log {
     $quiet || echo "$(date +"%F %T" ) $PROGNAME: $message" 
 }
 
-while getopts "o:qh" opt
+while getopts "b:c:t:qh" opt
 do
     case $opt in
-        o)  option=$OPTARG
+        b)  directory=$OPTARG
+            ;;
+        c)  count=$OPTARG
+            ;;
+        t)  tag=$OPTARG
             ;;
         q)  quiet=true
             ;;
