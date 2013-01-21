@@ -59,7 +59,7 @@ function rotate {
 
     # Drops oldest max rotation:
     [ -e $snaplocation/$volumename-$tag-$maxrotations ] && \
-        btrfs subvolume delete $snaplocation/$volumename-$tag-$maxrotations
+        /sbin/btrfs subvolume delete $snaplocation/$volumename-$tag-$maxrotations
 
     for i in `seq $maxrotations -1 1`
     do
@@ -82,7 +82,7 @@ function snapit {
 
     [ ! -e "$snaplocation/$volumename-$tag-1" ] || \
         die "2" "$snaplocation/$volumename-$tag-1 already exists"
-    btrfs subvolume snapshot \
+    /sbin/btrfs subvolume snapshot \
         $volume $snaplocation/$volumename-$tag-1
 }
 
@@ -112,6 +112,7 @@ do
 done  
 
 echo $directory
+[ -n "$directory" ] || die 4 "Directory to snapshot not set."
 
 rotate "$directory/.snapshots" "$directory" "$count" "$tag"
 
