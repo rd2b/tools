@@ -91,7 +91,7 @@ count=10
 tag="default"
 
 destination=""
-destinationsubdir="./snapshots"
+destinationsubdir="./.snapshots"
 
 while getopts "b:c:t:d:qh" opt
 do
