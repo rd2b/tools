@@ -90,8 +90,10 @@ directory="notset"
 count=10
 tag="default"
 
+destination=""
+destinationsubdir="./snapshots"
 
-while getopts "b:c:t:qh" opt
+while getopts "b:c:t:d:qh" opt
 do
     case $opt in
         b)  directory="$OPTARG"
@@ -99,6 +101,8 @@ do
         c)  count="$OPTARG"
             ;;
         t)  tag="$OPTARG"
+            ;;
+        d)  destination="$OPTARG"
             ;;
         q)  quiet=true
             ;;
@@ -111,10 +115,13 @@ do
     esac
 done  
 
-echo $directory
+[ -n "$destination" ] || destination="$directory/$destinationsubdir"
+
+log "debug" "Saving snapshot to $directory"
+
 [ -n "$directory" ] || die 4 "Directory to snapshot not set."
 
-rotate "$directory/.snapshots" "$directory" "$count" "$tag"
+rotate "$destination" "$directory" "$count" "$tag"
 
-snapit "$directory/.snapshots" "$directory" "$tag"
+snapit "$destination" "$directory" "$tag"
 
