@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-""" webcheck.py : Description """
+""" webcheck.py : Checks a an URL and looks for keyword. """
 
 __author__ = "R 2b"
 __date__ = "2012/12/06"

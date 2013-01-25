@@ -12,7 +12,9 @@ class  Worker(object):
     """ Interacts with database"""
     mydb = None
 
-    def __init__(self):
+    def __init__(self, dburl):
+        if not dburl:
+             return False
         self.mydb = DbHandler()
         self.mydb.createengine(url = 'sqlite:///:memory:')
 

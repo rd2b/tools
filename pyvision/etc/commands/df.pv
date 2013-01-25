@@ -1,4 +1,4 @@
 [Command]
-starting=
+starting=2011-02-27 18:00
 seconds=60
-command="df"
+command="/opt/pyvision/scripts/pyv-df.bash"
