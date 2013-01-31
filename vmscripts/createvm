@@ -48,10 +48,16 @@ sudo $VMBUILDER kvm ubuntu --suite $version --flavour virtual --arch amd64 -o \
 sudo su -c "echo \"$ip $hostname\" >> /etc/hosts"
 echo "$hostname build at $ip"
 
+
+
 sudo virsh autostart $hostname
 sudo virsh start $hostname
 
 sleep 1m
+
+ssh-keygen -R $hostname
+ssh-keygen -R $ip
+
 
 
 exit 0
