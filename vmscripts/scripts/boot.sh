@@ -7,9 +7,9 @@ apt-get install -qqy --force-yes openssh-server
 sed -i "s/VCS=\"bzr\"/VCS=\"git\"/" /etc/etckeeper/etckeeper.conf
 etckeeper init
 
-apt-get install -qqy --force-yes glusterfs-client
-mkdir -p /data/commun
+#apt-get install -qqy --force-yes glusterfs-client
+#mkdir -p /data/commun
 
-echo "# Partage glusterfs :" >> /etc/fstab
-echo "vm01.acgform.local:/COMMUN /data/commun glusterfs defaults 0 0" >> /etc/fstab
+#echo "# Partage glusterfs :" >> /etc/fstab
+#echo "vm01.acgform.local:/COMMUN /data/commun glusterfs defaults 0 0" >> /etc/fstab
 
