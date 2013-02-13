@@ -1,7 +1,8 @@
 #!/bin/bash
 #########################################################
 #   Filename   : btrfsrotate                            #
-#   Description: TODO                                   #
+#   Description:    Makes a btrfs snapshot rotation     #
+#                   as in logrotate                     #
 #########################################################
 
 PROGNAME="$(basename $0)"
@@ -21,8 +22,11 @@ Options:
     -h  prints this help message.
 
 Example:
+    * Keep 12 snapshots rotations with the tag "monthly":
     $PROGNAME -b /data -c 12 -t monthly 
-    $PROGNAME -b /data -c 7 -t daily
+
+    * Keep 7 rotations with the tag daily":
+    $PROGNAME -b /data -c 7 -t "daily"
 EOF
 }
 
@@ -91,7 +95,7 @@ count=10
 tag="default"
 
 destination=""
-destinationsubdir="./snapshots"
+destinationsubdir="./.snapshots"
 
 while getopts "b:c:t:d:qh" opt
 do

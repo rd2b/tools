@@ -11,6 +11,7 @@ from PyVision_server import GetAlertsResponse
 from ComplexTypes import Alert
 
 from Worker import Worker
+from Config import Config
 
 def echo(message):
     response = EchoResponse()
@@ -54,10 +55,11 @@ def getalerts(Message = None):
     logging.debug("Sending alerts : " + response._Message)
     return response
     
-
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
     logging.info("Starting...")
+    config = Config("/etc/pyvision/server.conf")
+    config.load()
     dispatch.AsServer(port=8080)
     logging.info("Exiting...")
 
