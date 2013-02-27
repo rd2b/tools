@@ -6,8 +6,11 @@ import cherrypy
 import logging
 
 from data import Data
+from worker import Storage
 
 class WebServer:
+    _storage = {}
+
     def __init__(self):
         pass
 
