@@ -9,26 +9,37 @@ from data import Data
 from worker import Storage
 
 class WebServer:
-    _storage = {}
+    _storage = Storage()
 
     def __init__(self):
         pass
 
-    @cherrypy.expose
-    def index(self):
-        return "index"
+    def storage(self, storage = None ):
+        if storage:
+            self._storage = storage
+        return self._storage
+
 
     @cherrypy.expose
-    def register(self, timestamp, reference, level = 0, test = 'default'):
+    def all(self):
+        response = str(self.storage())
 
-        logging.info("Registering {0}, {1}, {2}, {3}".format(
-            str(timestamp), reference, level, test))
+        return response
+
+    @cherrypy.expose
+    def register(self, 
+            timestamp, reference, level = 0, test = 'default', data = ""):
+
+        logging.info("Registering {0}, {1}, {2}, {3} {4}".format(
+            str(timestamp), reference, level, test, data))
 
         try:
             newdata = Data(timestamp = timestamp,
                 reference = reference,
                 level = level,
-                test = test)
+                test = test,
+                data = data)
+            self.storage().append(newdata)
             response = "Success"
         except ValueError:
             logging.error("Supplied an invalid input")

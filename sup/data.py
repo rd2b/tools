@@ -2,7 +2,7 @@
 
 """ data.py : Description """
 
-__author__ = "<author>"
+__author__ = "Remi Debay"
 __date__ = "2013/01/31"
 
 
