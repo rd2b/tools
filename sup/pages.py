@@ -19,8 +19,23 @@ class WebServer:
 
 class Overview(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(str(ws.last()))
+        self.response.headers['Content-Type'] = 'text/html'
+        mystorage = ws.storage()
+        datas = mystorage.lastsdatas()
+        response="<table>"
+        for reference in datas.keys():
+            response+="<tr>"
+            response+="<td>"+reference+"</td>"
+            for test in datas[reference].keys():
+                if datas[reference][test]:
+                    level = str(datas[reference][test].level)
+                    response+="<td>" + level + "</td>"
+                else:
+                    response+="<td>X</td>"
+            response+="</tr>"
+        response+="</table>"
+
+        self.response.write(response)
 
 class Event(webapp2.RequestHandler):
     def get(self):
