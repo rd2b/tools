@@ -7,32 +7,41 @@ __date__ = "2013/01/31"
 
 
 import threading
-class Storage:
-    _datas = {}
 
+from google.appengine.ext import db
+
+class Data(db.Model):
+    level = db.IntegerProperty()
+    test = db.StringProperty()
+    reference = db.StringProperty() 
+    timestamp = db.IntegerProperty()
+    data = db.StringProperty(multiline = True)
+
+class Storage:
     def __init__(self):
         pass
 
-    def append(self, data):
-        datas = self.datas()
-        if  not data.reference in datas :
-            datas[data.reference] = {}
+    def append(self, level, test, reference, timestamp, data):
+        newdata = Data()
+        
+        newdata.level = int(level)
+        newdata.test = str(test)
+        newdata.reference = str(reference)
+        newdata.timestamp = int(timestamp)
+        newdata.data = str(data)
 
-        if not data.test in datas[data.reference]:
-            datas[data.reference][data.test] = {}
+        newdata.put()
 
-        datas[data.reference][data.test][data.timestamp] = data
 
         
     def datas(self):
-        return self._datas
+        datas = db.GqlQuery("Select * FROM Data")
+        return datas
 
 
     def __str__(self):
         response = []
         datas = self.datas()
-        for byreference in datas.values():
-            for bytest in byreference.values():
-                for bytime in bytest.values():
-                    response.append(str(bytime))
+        for data in datas:
+            response.append(str(data))
         return str(response)
