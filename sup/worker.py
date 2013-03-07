@@ -35,8 +35,22 @@ class Storage:
 
         
     def datas(self):
-        datas = db.GqlQuery("Select * FROM Data")
+        datas = db.GqlQuery("Select * FROM Data "
+                "ORDER BY reference, test, timestamp")
         return datas
+
+    def lastsdatas(self):
+        datas = self.datas
+
+        last = []
+        for data in datas:
+            if ( not last[data.test][data.reference] 
+                    or data.timestamp > last[data.test][data.reference].timestamp):
+                last[data.test][data.reference] = data
+        return last
+
+
+
 
 
     def __str__(self):
