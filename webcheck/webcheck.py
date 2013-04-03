@@ -13,6 +13,31 @@ import logging
 
 from threading import Thread
 from Queue import Queue
+from datetime import datetime
+
+class Send():
+    """" Sends status to my-mon.appspot.com"""
+    def __init__(self, url, timeout = 30, testname = 'content'):
+        self.url = url
+        self.testname = testname
+        self.timeout = timeout
+
+    def send(self, website = "unkown", data = "no data", level = 5 ):
+        website = website.replace("http://","")
+        request="reference={0}&test={1}&timestamp={2}&level={3}&data={4}".format(
+                website,
+                self.testname,
+                datetime.now().strftime("%y%m%d%H%M"),
+                level,
+                data)
+        try:
+            myurl = self.url + '?' + request
+            openned = urllib2.urlopen( myurl, timeout = self.timeout )
+        except ValueError:
+            logging.error("Not a valid URL %s.", myurl)
+        except IOError:
+            logging.error("Cannot open %s.", myurl)
+
 
 class UrlCheck():
     """ Handle a single url and its keywords """
@@ -22,6 +47,8 @@ class UrlCheck():
         self.keywords = dict()
         self.available = False
 
+        self.monit = Send("http://my-mon.appspot.com/event")
+
     def addkeyword(self, keyword):
         """ Add keyword to list """
         self.keywords[keyword] = False
@@ -29,11 +56,13 @@ class UrlCheck():
     def finded(self, keyword):
         """ Sets a keyword to finded """
         logging.info("%s found at %s.", keyword, self.url)
+        self.monit.send(website = self.url, data = "keyword found" , level = 0)
         self.keywords[keyword] = True
 
     def missing(self, keyword):
         """ Sets a keyword to missing (default is missing for unchecked) """
         logging.error("%s missing at %s.", keyword, self.url)
+        self.monit.send(website = self.url, data = "keyword missing" , level = 3)
         self.keywords[keyword] = False
 
     def __str__(self):
@@ -46,12 +75,13 @@ class UrlCheck():
 
     def markavailable(self):
         """ Sets URL as available """
-        logging.info("%s available.", self.url)
+        logging.info("%s available", self.url)
         self.available = True
 
     def markunavailable(self):
         """ Sets URL as not available """
         logging.error("%s unavailable.", self.url)
+        self.monit.send(website = self.url, data = "Site unavailable" , level = 3)
         self.available = False
 
     def runcheck(self):
