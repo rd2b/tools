@@ -40,13 +40,16 @@ class Storage:
         return datas
 
     def lastsdatas(self):
-        datas = self.datas
+        datas = self.datas()
 
-        last = []
+        last = {}
         for data in datas:
-            if ( not last[data.test][data.reference] 
-                    or data.timestamp > last[data.test][data.reference].timestamp):
-                last[data.test][data.reference] = data
+            if not data.reference in last :
+                last[data.reference] = {}
+            if not data.test in last[data.reference]:
+                last[data.reference][data.test] = data
+            elif  last[data.reference][data.test].timestamp < data.timestamp:
+                last[data.reference][data.test] = data
         return last
 
 
