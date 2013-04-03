@@ -33,7 +33,7 @@ class UrlCheck():
 
     def missing(self, keyword):
         """ Sets a keyword to missing (default is missing for unchecked) """
-        logging.info("%s missing at %s.", keyword, self.url)
+        logging.error("%s missing at %s.", keyword, self.url)
         self.keywords[keyword] = False
 
     def __str__(self):
@@ -51,19 +51,19 @@ class UrlCheck():
 
     def markunavailable(self):
         """ Sets URL as not available """
-        logging.info("%s unavailable.", self.url)
+        logging.error("%s unavailable.", self.url)
         self.available = False
 
     def runcheck(self):
         """ Connects to URL, and check if keywords are found """
-        logging.info("Checking {0}".format(self.url))
+        logging.debug("Checking {0}".format(self.url))
         try:
             openned = urllib2.urlopen( self.url, timeout = self.timeout )
             self.markavailable()
             content = openned.read()
 
             for keyword in self.keywords.keys():
-                logging.info("Checking {0} with keyword {1}".format(
+                logging.debug("Checking {0} with keyword {1}".format(
                     self.url, keyword))
                 if keyword in content:
                     self.finded(keyword)
@@ -139,7 +139,7 @@ class Checker():
         return response
 
     def check(self, url):
-        logging.info("Checking single url: %s", url)
+        logging.debug("Checking single url: %s", url)
         if url in self.urls:
             self.queue.put(self.urls[url])
         self.queue.join()
@@ -153,7 +153,7 @@ class Checker():
             self.queue.task_done()
 
     def checkall(self ):
-        logging.info("Starting check")
+        logging.debug("Starting check")
 
         for url in self.urls.values():
             logging.debug("Sending %s to task queue.", url)
@@ -161,22 +161,22 @@ class Checker():
 
         if not ( len(self.urls) == 0 and self.queue.empty() ):
             self.queue.join()
-        logging.info("Ending check")
+        logging.debug("Ending check")
 
 
 def main():
     """ Default main function """
     myformat = "%(asctime)s %(message)s"
     logging.basicConfig(
-            level = logging.INFO,
+            level = logging.WARN,
             format = myformat)
 
-    logging.info("Program starting...")
+    logging.debug("Program starting...")
 
     checker = Checker()
 
     for line in sys.stdin:
-        logging.info("New url added %s", line)
+        logging.debug("New url added %s", line)
         arr = line.split(",")
         checker.add(arr[0])
         if (len(arr) == 2):
