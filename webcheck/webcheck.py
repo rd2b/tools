@@ -6,6 +6,7 @@ __author__ = "R 2b"
 __date__ = "2012/12/06"
 
 import urllib2
+import urllib
 
 import sys
 
@@ -23,15 +24,23 @@ class Send():
         self.timeout = timeout
 
     def send(self, website = "unkown", data = "no data", level = 5 ):
-        website = website.replace("http://","")
-        request="reference={0}&test={1}&timestamp={2}&level={3}&data={4}".format(
-                website,
-                self.testname,
-                datetime.now().strftime("%y%m%d%H%M"),
-                level,
-                data)
+        now = datetime.now().strftime("%Y%m%d%H%M")
+        contentparams = urllib.urlencode({
+                'reference' : website.replace("http://",""),
+                'test' : self.testname,
+                'timestamp' : now,
+                'level' : level,
+                'data' : data })
+        heartbeatparams = urllib.urlencode({
+                'reference' : website.replace("http://",""),
+                'test' : 'heartbeat',
+                'timestamp' : now,
+                'level' : now,
+                'data' : data })
         try:
-            myurl = self.url + '?' + request
+            myurl = self.url + '?' + contentparams
+            openned = urllib2.urlopen( myurl, timeout = self.timeout )
+            myurl = self.url + '?' + heartbeatparams
             openned = urllib2.urlopen( myurl, timeout = self.timeout )
         except ValueError:
             logging.error("Not a valid URL %s.", myurl)
