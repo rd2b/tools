@@ -84,7 +84,7 @@ class UrlCheck():
         self.monit.send(website = self.url, data = "Site unavailable" , level = 3)
         self.available = False
 
-    def runcheck(self):
+    def runcheck(self, retry = True):
         """ Connects to URL, and check if keywords are found """
         logging.debug("Checking {0}".format(self.url))
         try:
@@ -102,7 +102,11 @@ class UrlCheck():
         except ValueError:
             logging.error("Not a valid URL %s.", self.url)
         except IOError:
-            self.markunavailable()
+
+            if retry:
+                self.runcheck(retry = False)
+            else:
+                self.markunavailable()
 
     def repport (self):
         """ Sets a keyword to finded """
