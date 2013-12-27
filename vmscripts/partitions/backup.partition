@@ -1,7 +1,0 @@
-root 5000
-swap 1024
----
-/home 5000
-/opt 1000
-/var 3000
-/var/log 3000
